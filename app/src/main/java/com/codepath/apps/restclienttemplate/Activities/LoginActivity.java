@@ -1,9 +1,13 @@
-package com.codepath.apps.restclienttemplate;
+package com.codepath.apps.restclienttemplate.Activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
+import android.widget.Button;
 
+import com.codepath.apps.restclienttemplate.R;
+import com.codepath.apps.restclienttemplate.RestClient;
 import com.codepath.oauth.OAuthLoginActionBarActivity;
 import com.codepath.oauth.OAuthLoginActivity;
 
@@ -13,6 +17,14 @@ public class LoginActivity extends OAuthLoginActionBarActivity<RestClient> {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
+
+        final Button btnLogin = (Button) this.findViewById(R.id.btnLogin);
+        btnLogin.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                loginToRest(v);
+            }
+        });
 	}
 
 
@@ -23,12 +35,11 @@ public class LoginActivity extends OAuthLoginActionBarActivity<RestClient> {
 		return true;
 	}
 
-	// OAuth authenticated successfully, launch primary authenticated activity
-	// i.e Display application "homepage"
+	// OAuth authenticated successfully, launch first authenticated activity
 	@Override
 	public void onLoginSuccess() {
-		// Intent i = new Intent(this, PhotosActivity.class);
-		// startActivity(i);
+		Intent i = new Intent(this, TimelineActivity.class);
+		startActivity(i);
 	}
 
 	// OAuth authentication flow failed, handle the error
