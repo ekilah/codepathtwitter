@@ -24,7 +24,20 @@ public class Tweet extends Model{
     @Column(name = "poster")
     private User poster;
 
+    @Column(name = "posterFavorited")
+    private boolean posterFavorited;
 
+    @Column(name = "posterRetweeted")
+    private boolean posterRetweeted;
+
+    @Column(name = "favoriteCount")
+    private long favoriteCount;
+
+    @Column(name = "retweetCount")
+    private long retweetCount;
+
+    @Column(name = "tweetId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    private long tweetId;
 
     //required empty constructor for activeandroid
     public Tweet(){
@@ -39,9 +52,18 @@ public class Tweet extends Model{
         //req'd by activeandroid
         super();
 
+        updateFromJson(tweetObj);
+    }
+
+    public void updateFromJson(JSONObject tweetObj){
         try {
             this.timestampString = tweetObj.getString(TwitterApi.RESPONSE_KEY_TIMESTAMP);
             this.body = tweetObj.getString(TwitterApi.RESPONSE_KEY_TEXT);
+            this.posterFavorited = tweetObj.getBoolean(TwitterApi.RESPONSE_KEY_USER_FAVORITED);
+            this.posterRetweeted = tweetObj.getBoolean(TwitterApi.RESPONSE_KEY_USER_RETWEETED);
+            this.favoriteCount = tweetObj.getLong(TwitterApi.RESPONSE_KEY_FAVORITE_COUNT);
+            this.retweetCount = tweetObj.getLong(TwitterApi.RESPONSE_KEY_RETWEET_COUNT);
+            this.tweetId = tweetObj.getLong(TwitterApi.RESPONSE_KEY_ID);
 
             JSONObject userObj = tweetObj.getJSONObject(TwitterApi.RESPONSE_KEY_USER);
             this.poster = User.findOrCreateFromJson(userObj);
@@ -93,5 +115,46 @@ public class Tweet extends Model{
 
     public void setPoster(User poster){
         this.poster = poster;
+    }
+
+    public boolean posterFavorited(){
+        return posterFavorited;
+    }
+
+    public void setPosterFavorited(boolean posterFavorited){
+        this.posterFavorited = posterFavorited;
+    }
+
+    public boolean posterRetweeted(){
+        return posterRetweeted;
+    }
+
+    public void setPosterRetweeted(boolean posterRetweeted){
+        this.posterRetweeted = posterRetweeted;
+    }
+
+    public long getFavoriteCount(){
+        return favoriteCount;
+    }
+
+    public void setFavoriteCount(long favoriteCount){
+        this.favoriteCount = favoriteCount;
+    }
+
+    public long getRetweetCount(){
+        return retweetCount;
+    }
+
+    public void setRetweetCount(long retweetCount){
+        this.retweetCount = retweetCount;
+    }
+
+
+    public long getTweetId(){
+        return tweetId;
+    }
+
+    public void setTweetId(long tweetId){
+        this.tweetId = tweetId;
     }
 }

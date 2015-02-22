@@ -13,6 +13,8 @@ import org.json.JSONObject;
  */
 public class User extends Model{
 
+    public static User authenticatedUser;
+
     @Column(name = "userId", unique = true)
     private String userId;
 

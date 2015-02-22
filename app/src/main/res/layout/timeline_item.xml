@@ -4,6 +4,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingLeft="10dp"
+                android:paddingStart="10dp"
+                android:paddingRight="10dp"
+                android:paddingEnd="10dp"
                 android:paddingTop="10dp"
                 android:paddingBottom="10dp"
 
@@ -15,53 +18,118 @@
         tools:src="@drawable/ic_launcher"
         android:scaleType="fitCenter"
         android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
         />
 
-    <TextView android:id="@+id/tvTimelineItemPosterProfileName"
-        android:layout_width="wrap_content"
+    <LinearLayout android:id="@+id/llNameAndTimeBar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/ivTimelineItemPosterAvatar"
+        android:layout_toEndOf="@id/ivTimelineItemPosterAvatar"
         android:layout_alignTop="@id/ivTimelineItemPosterAvatar"
-        android:textColor="#000000"
 
-        tools:text="My Profile Name"
-        />
-
-    <TextView android:id="@+id/tvTimelineItemPosterUsername"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/tvTimelineItemPosterProfileName"
-        android:layout_alignBaseline="@id/tvTimelineItemPosterProfileName"
-        android:layout_marginLeft="5dp"
-        android:textColor="#ff9e9e9e"
-        android:textSize="11sp"
-        tools:text="\@myprofilename"
-        />
-
-    <TextView android:id="@+id/tvTimelineItemTimestamp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_toRightOf="@id/tvTimelineItemPosterUsername"
-        android:layout_alignBaseline="@id/tvTimelineItemPosterProfileName"
-        android:gravity="right"
-        android:layout_marginRight="10dp"
-        android:layout_marginLeft="5dp"
-        android:textColor="#ffb7b7b7"
+        >
 
 
-        tools:text="22s"
-        />
+        <TextView android:id="@+id/tvTimelineItemPosterProfileName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#000000"
+
+            tools:text="My Profile Name It's Long"
+            android:singleLine="true"
+            android:ellipsize="end"
+
+            />
+
+        <TextView android:id="@+id/tvTimelineItemPosterUsername"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/tvTimelineItemPosterProfileName"
+            android:layout_marginLeft="5dp"
+            android:textColor="#ff9e9e9e"
+            android:textSize="11sp"
+            tools:text="\@myprofilename"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:layout_weight="1"
+
+            />
+
+        <TextView android:id="@+id/tvTimelineItemTimestamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignBaseline="@id/tvTimelineItemPosterProfileName"
+            android:gravity="end"
+            android:layout_marginLeft="5dp"
+            android:textColor="#ffb7b7b7"
+            android:layout_weight="0"
+
+            tools:text="66m"
+            />
+    </LinearLayout>
 
     <TextView android:id="@+id/tvTimelineItemTweetBody"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/ivTimelineItemPosterAvatar"
-        android:layout_below="@id/tvTimelineItemPosterProfileName"
-        android:layout_marginTop="7dp"
-        android:layout_marginRight="10dp"
+        android:layout_below="@id/llNameAndTimeBar"
+        android:layout_marginTop="3dp"
+        android:autoLink="web"
 
         tools:text="Wow this paragraph of text is really long... I wish tweets were restricted to less than 140 characters. It's like JK Rowling tweeting a freaking Harry Potter book over here."
         />
+
+    <LinearLayout android:id="@+id/rlTimelineItemInteractionBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvTimelineItemTweetBody"
+        android:layout_toRightOf="@id/ivTimelineItemPosterAvatar"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal"
+
+        >
+        <TextView android:id="@+id/tvReply"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            tools:drawableStart="@android:drawable/ic_menu_revert"
+            tools:drawableLeft="@android:drawable/ic_menu_revert"
+            android:clickable="true"
+            android:gravity="left|center_vertical"
+
+
+            />
+
+        <TextView android:id="@+id/tvRetweet"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            tools:drawableLeft="@android:drawable/ic_popup_sync"
+            tools:drawableStart="@android:drawable/ic_popup_sync"
+            android:clickable="true"
+            tools:text="437"
+            android:gravity="left|center_vertical"
+
+
+            />
+
+        <TextView android:id="@+id/tvFavorite"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+
+            tools:drawableStart="@android:drawable/btn_star_big_off"
+            tools:drawableLeft="@android:drawable/btn_star_big_off"
+            android:gravity="left|center_vertical"
+            tools:text="981"
+            android:clickable="true"
+
+
+            />
+
+
+        </LinearLayout>
 
 </RelativeLayout>

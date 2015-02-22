@@ -5,6 +5,7 @@ import org.scribe.builder.api.FlickrApi;
 import org.scribe.builder.api.TwitterApi;
 
 import android.content.Context;
+import android.widget.Toast;
 
 import com.codepath.oauth.OAuthBaseClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -33,26 +34,61 @@ public class RestClient extends OAuthBaseClient {
 		super(context, REST_API_CLASS, REST_URL, REST_CONSUMER_KEY, REST_CONSUMER_SECRET, REST_CALLBACK_URL);
 	}
 
-    public void getHomeTimeline(int page, AsyncHttpResponseHandler handler) {
+    public void getHomeTimeline(long maxId, long sinceId, AsyncHttpResponseHandler handler) {
         String apiUrl = getApiUrl("statuses/home_timeline.json");
         RequestParams params = new RequestParams();
-        params.put("page", String.valueOf(page));
+
+        if(maxId >=0){
+            params.put("max_id", maxId);
+        }
+        if(sinceId >=0){
+            params.put("since_id", sinceId);
+        }
+
         getClient().get(apiUrl, params, handler);
     }
 
-    public void postTweet(String body, AsyncHttpResponseHandler handler) {
+    public void getUserAccountInfo(AsyncHttpResponseHandler handler){
+        String apiUrl = getApiUrl("account/verify_credentials.json");
+        getClient().get(apiUrl, handler);
+    }
+
+    /**
+     * @param body Tweet text to send via the API
+     * @param handler The response handler. This endpoint returns a {Tweet}
+     */
+    public void postTweet(String body, AsyncHttpResponseHandler handler){
+        postTweet(body, handler, -1);
+    }
+
+    /**
+     * @param body Tweet text to send via the API
+     * @param handler The response handler. This endpoint returns a {Tweet}
+     * @param inReplyToTweetId The id that this tweet is in response to. Negative numbers can be used to ignore this param
+     */
+    public void postTweet(String body, AsyncHttpResponseHandler handler, long inReplyToTweetId) {
+        if(body == null || body.length() == 0){
+            Toast.makeText(context, "Can't post empty tweet.", Toast.LENGTH_SHORT).show();
+            return;
+        }
         String apiUrl = getApiUrl("statuses/update.json");
         RequestParams params = new RequestParams();
         params.put("status", body);
+        if(inReplyToTweetId >=0){
+            params.put("in_reply_to_status_id", inReplyToTweetId);
+        }
         getClient().post(apiUrl, params, handler);
     }
 
-	/* 1. Define the endpoint URL with getApiUrl and pass a relative path to the endpoint
-	 * 	  i.e getApiUrl("statuses/home_timeline.json");
-	 * 2. Define the parameters to pass to the request (query or body)
-	 *    i.e RequestParams params = new RequestParams("foo", "bar");
-	 * 3. Define the request method and make a call to the client
-	 *    i.e client.get(apiUrl, params, handler);
-	 *    i.e client.post(apiUrl, params, handler);
-	 */
+    public void favoriteTweetWithId(long tweetId, boolean favorite, AsyncHttpResponseHandler handler){
+        String apiUrl = getApiUrl("favorites/" + (favorite ? "create" : "destroy") +".json");
+        RequestParams params = new RequestParams();
+        params.put("id", tweetId);
+        getClient().post(apiUrl, params, handler);
+    }
+
+    public void retweetTweetWithId(long tweetId, AsyncHttpResponseHandler handler){
+        String apiUrl = getApiUrl("statuses/retweet/" + (String.valueOf(tweetId)) +".json");
+        getClient().post(apiUrl, handler);
+    }
 }
