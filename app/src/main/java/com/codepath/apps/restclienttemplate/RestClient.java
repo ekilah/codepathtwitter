@@ -5,6 +5,8 @@ import org.scribe.builder.api.FlickrApi;
 import org.scribe.builder.api.TwitterApi;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.widget.Toast;
 
 import com.codepath.oauth.OAuthBaseClient;
@@ -58,7 +60,7 @@ public class RestClient extends OAuthBaseClient {
      * @param handler The response handler. This endpoint returns a {Tweet}
      */
     public void postTweet(String body, AsyncHttpResponseHandler handler){
-        postTweet(body, handler, -1);
+         postTweet(body, handler, -1);
     }
 
     /**
@@ -90,5 +92,11 @@ public class RestClient extends OAuthBaseClient {
     public void retweetTweetWithId(long tweetId, AsyncHttpResponseHandler handler){
         String apiUrl = getApiUrl("statuses/retweet/" + (String.valueOf(tweetId)) +".json");
         getClient().post(apiUrl, handler);
+    }
+
+    public Boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) this.context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
     }
 }

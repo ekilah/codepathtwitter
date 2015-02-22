@@ -61,6 +61,10 @@ public class LoginActivity extends OAuthLoginActionBarActivity<RestClient> {
 	// Uses the client to initiate OAuth authorization
 	// This should be tied to a button used to login
 	public void loginToRest(View view) {
+        if(!getClient().isNetworkAvailable()){
+            Toast.makeText(this, "No internet connection.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 		getClient().connect();
 	}
 

@@ -34,7 +34,6 @@ import java.util.Set;
 
 public class TimelineActivity extends ActionBarActivity{
 
-
     private ArrayList<Tweet> tweets;
     private TweetArrayAdapter tweetArrayAdapter;
     private ListView lvFeed;
@@ -89,6 +88,10 @@ public class TimelineActivity extends ActionBarActivity{
     private void fetchNewerTweets(){
         Log.d("TWITTER", "fetchNewerTweets: sinceId on entry=" + sinceId);
         RestClient client = RestApplication.getRestClient();
+        if(!client.isNetworkAvailable()){
+            notifyNetworkUnavailable();
+            return;
+        }
         client.getHomeTimeline(-1, sinceId, new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response){
@@ -112,7 +115,7 @@ public class TimelineActivity extends ActionBarActivity{
 
                     for(Map.Entry<Long, Tweet> entry: entrySet){
                         if(entry.getKey().longValue() == newList.get(i).getTweetId()){
-                            Log.e("TWITTER", "userPostedTweetId entry " + entry.getKey().longValue() + " is the same as newList[" + i + "]. removing old instance");
+                            Log.w("TWITTER", "userPostedTweetId entry " + entry.getKey().longValue() + " is the same as newList[" + i + "]. removing old instance");
                             duplicatedTweet = entry;
                             break;
                         }
@@ -120,10 +123,10 @@ public class TimelineActivity extends ActionBarActivity{
 
                     if(duplicatedTweet != null){
                         boolean removalSuccess = tweets.remove(duplicatedTweet.getValue());
-                        Log.e("TWITTER", "Removal from tweets success: " + removalSuccess);
+                        Log.w("TWITTER", "Removal from tweets success: " + removalSuccess);
 
                         entrySet.remove(duplicatedTweet);
-                        Log.e("TWITTER", "Removal from userPostedTweetIds success: " + removalSuccess);
+                        Log.w("TWITTER", "Removal from userPostedTweetIds success: " + removalSuccess);
                     }
 
                     tweets.add(0, newList.get(i));
@@ -146,6 +149,10 @@ public class TimelineActivity extends ActionBarActivity{
      */
     private void fetchMoreTweets(){
         RestClient client = RestApplication.getRestClient();
+        if(!client.isNetworkAvailable()){
+            notifyNetworkUnavailable();
+            return;
+        }
         client.getHomeTimeline(maxId, -1, new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response){
@@ -213,7 +220,12 @@ public class TimelineActivity extends ActionBarActivity{
 
         if(User.authenticatedUser == null){
             //we don't know the data about the auth'd user yet. fetch and remember
-            RestApplication.getRestClient().getUserAccountInfo(new JsonHttpResponseHandler(){
+            RestClient client = RestApplication.getRestClient();
+            if(!client.isNetworkAvailable()){
+                notifyNetworkUnavailable();
+                return;
+            }
+            client.getUserAccountInfo(new JsonHttpResponseHandler(){
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response){
                     Log.d("TWITTER", "user credentials: " + response.toString());
@@ -249,7 +261,12 @@ public class TimelineActivity extends ActionBarActivity{
     }
 
     public void SendTweet(final String tweetBody, Tweet inReplyToTweet){
-        RestApplication.getRestClient().postTweet(tweetBody, new JsonHttpResponseHandler(){
+        RestClient client = RestApplication.getRestClient();
+        if(!client.isNetworkAvailable()){
+            notifyNetworkUnavailable();
+            return;
+        }
+        client.postTweet(tweetBody, new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response){
                 //response is a Tweet object representing the tweet we sent out
@@ -270,5 +287,9 @@ public class TimelineActivity extends ActionBarActivity{
                 Toast.makeText(TimelineActivity.this, "Tweet failed to post", Toast.LENGTH_SHORT);
             }
         }, (inReplyToTweet == null ? -1 : inReplyToTweet.getTweetId()));
+    }
+
+    public void notifyNetworkUnavailable(){
+        Toast.makeText(this, "No internet connection.", Toast.LENGTH_SHORT).show();
     }
 }

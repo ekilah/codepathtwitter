@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.text.Html;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -79,7 +80,7 @@ public class TweetArrayAdapter extends ArrayAdapter<Tweet>{
         Picasso.with(getContext()).load(getItem(position).getPoster().getAvatarURL()).into(holder.ivPosterAvatar);
         holder.tvUsername.setText("@" + getItem(position).getPoster().getUsername());
         holder.tvProfilename.setText(getItem(position).getPoster().getProfilename());
-        holder.tvBody.setText(getItem(position).getBody());
+        holder.tvBody.setText(Html.fromHtml(getItem(position).getBody()));
         holder.tvTimestamp.setText(this.getRelativeTimeAgo(getItem(position).getTimestampString()));
 
         holder.tvRetweet.setText(NumberFormat.getNumberInstance(convertView.getResources().getConfiguration().locale).format(getItem(position).getRetweetCount()));
@@ -100,12 +101,19 @@ public class TweetArrayAdapter extends ArrayAdapter<Tweet>{
                 @Override
                 public void onClick(final View v){
 
-                    RestApplication.getRestClient().retweetTweetWithId(getItem(position).getTweetId(), new JsonHttpResponseHandler(){
+                    RestClient client = RestApplication.getRestClient();
+                    if(!client.isNetworkAvailable()){
+                        Toast.makeText(getContext(), "No internet connection.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    client.retweetTweetWithId(getItem(position).getTweetId(), new JsonHttpResponseHandler(){
                         @Override
                         public void onSuccess(int statusCode, Header[] headers, JSONObject response){
                             getItem(position).setPosterRetweeted(!getItem(position).posterRetweeted());
                             if(getItem(position).posterRetweeted()){
-                                ((Drawable)v.getTag()).setColorFilter(Color.GREEN, PorterDuff.Mode.MULTIPLY);
+                                ((Drawable) v.getTag()).setColorFilter(Color.GREEN, PorterDuff.Mode.MULTIPLY);
+                                getItem(position).setRetweetCount(getItem(position).getRetweetCount() + 1);
+                                holder.tvRetweet.setText(String.valueOf(getItem(position).getRetweetCount()));
                                 holder.tvRetweet.setClickable(false);//prevent attempts to retweet again
                             }else{
                                 Log.e("TWITTER", "shouln't be able to un-retweet");
@@ -114,7 +122,7 @@ public class TweetArrayAdapter extends ArrayAdapter<Tweet>{
 
                         @Override
                         public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse){
-                            Toast.makeText(getContext(),getContext().getString(R.string.unable_to_retweet), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), getContext().getString(R.string.unable_to_retweet), Toast.LENGTH_SHORT).show();
                             if(errorResponse != null){
                                 Log.e("TWITTER", "Failed to retweet. Error: " + errorResponse.toString(), throwable);
                             }
@@ -144,6 +152,10 @@ public class TweetArrayAdapter extends ArrayAdapter<Tweet>{
                 final boolean isBeingFavorited = !getItem(position).posterFavorited();
 
                 RestClient client = RestApplication.getRestClient();
+                if(!client.isNetworkAvailable()){
+                    Toast.makeText(getContext(), "No internet connection.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 client.favoriteTweetWithId(getItem(position).getTweetId(), isBeingFavorited, new JsonHttpResponseHandler(){
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response){
