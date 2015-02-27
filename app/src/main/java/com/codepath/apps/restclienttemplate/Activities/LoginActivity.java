@@ -1,4 +1,4 @@
-package com.codepath.apps.restclienttemplate.Activities;
+package com.codepath.apps.restclienttemplate.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,7 +12,6 @@ import android.widget.Toast;
 import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.RestClient;
 import com.codepath.oauth.OAuthLoginActionBarActivity;
-import com.codepath.oauth.OAuthLoginActivity;
 import com.squareup.picasso.Picasso;
 
 public class LoginActivity extends OAuthLoginActionBarActivity<RestClient> {

@@ -15,19 +15,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.codepath.apps.restclienttemplate.Activities.TimelineActivity;
+import com.codepath.apps.restclienttemplate.activities.TimelineActivity;
 import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.RestApplication;
 import com.codepath.apps.restclienttemplate.RestClient;
+import com.codepath.apps.restclienttemplate.fragments.HomeTimelineFragment;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.squareup.picasso.Picasso;
 
 import org.apache.http.Header;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
-import java.sql.Time;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -38,11 +37,11 @@ import java.util.Locale;
  * Created by mekilah on 2/19/15.
  */
 public class TweetArrayAdapter extends ArrayAdapter<Tweet>{
-    private TimelineActivity timelineActivity;
+    private HomeTimelineFragment.TimelineFragmentListener timelineFragmentListener;
 
-    public TweetArrayAdapter(TimelineActivity callingActivity, List<Tweet> objects){
-        super((Context)callingActivity, 0, objects);
-        this.timelineActivity = callingActivity;
+    public TweetArrayAdapter(Context context, HomeTimelineFragment.TimelineFragmentListener callingActivity, List<Tweet> objects){
+        super(context, R.layout.timeline_item, objects);
+        this.timelineFragmentListener = callingActivity;
     }
 
     class TweetViewHolder{
@@ -58,7 +57,7 @@ public class TweetArrayAdapter extends ArrayAdapter<Tweet>{
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent){
-
+        Log.e("TWITTER", "tweetArrayAdapter.getView(position=" + position + ")");
         final TweetViewHolder holder;
         if(convertView == null){
             //inflate new view
@@ -184,7 +183,7 @@ public class TweetArrayAdapter extends ArrayAdapter<Tweet>{
         holder.tvReply.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                timelineActivity.ShowComposeTweetDialog(getItem(position));
+                timelineFragmentListener.ShowComposeTweetDialog(getItem(position));
             }
         });
 

@@ -1,4 +1,4 @@
-package com.codepath.apps.restclienttemplate.Fragments;
+package com.codepath.apps.restclienttemplate.fragments;
 
 import android.app.Dialog;
 import android.graphics.Color;
