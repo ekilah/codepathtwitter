@@ -1,7 +1,11 @@
 package com.codepath.apps.restclienttemplate.activities;
 
 import android.content.Context;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -14,6 +18,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.activeandroid.query.Select;
+import com.astuetz.PagerSlidingTabStrip;
 import com.codepath.apps.restclienttemplate.fragments.ComposeTweetFragment;
 import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.RestApplication;
@@ -38,6 +43,31 @@ import java.util.Set;
 public class TimelineActivity extends ActionBarActivity implements HomeTimelineFragment.TimelineFragmentListener{
 
     HomeTimelineFragment homeTimelineFragment;
+    ArrayList<HomeTimelineFragment> fragments;
+    ViewPager viewPager;
+    TimelinePagerAdapter timelinePagerAdapter;
+
+    private class TimelinePagerAdapter extends FragmentPagerAdapter{
+
+        private TimelinePagerAdapter(FragmentManager fm){
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position){
+            return TimelineActivity.this.fragments.get(position);
+        }
+
+        @Override
+        public int getCount(){
+            return TimelineActivity.this.fragments.size();
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position){
+            return TimelineActivity.this.fragments.get(position).visibleTitle;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -59,9 +89,20 @@ public class TimelineActivity extends ActionBarActivity implements HomeTimelineF
         setSupportActionBar(toolbar);
 
         homeTimelineFragment = HomeTimelineFragment.newInstance();
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.flTimelineActivityFrame, homeTimelineFragment);
-        transaction.commit();
+        homeTimelineFragment.visibleTitle = "Home";
+//        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//        transaction.replace(R.id.flTimelineActivityFrame, homeTimelineFragment);
+//        transaction.commit();
+
+        fragments = new ArrayList<>(2);
+        fragments.add(homeTimelineFragment);
+
+        viewPager = (ViewPager) findViewById(R.id.vpPager);
+        timelinePagerAdapter = new TimelinePagerAdapter(getSupportFragmentManager());
+        viewPager.setAdapter(timelinePagerAdapter);
+
+        PagerSlidingTabStrip pagerSlidingTabStrip = (PagerSlidingTabStrip) findViewById(R.id.tabs);
+        pagerSlidingTabStrip.setViewPager(viewPager);
     }
 
 

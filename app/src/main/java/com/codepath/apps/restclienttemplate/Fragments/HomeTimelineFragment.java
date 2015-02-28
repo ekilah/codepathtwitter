@@ -45,6 +45,8 @@ public class HomeTimelineFragment extends Fragment{
         public Context getContext();
     }
 
+    public String visibleTitle;
+
     public TimelineFragmentListener timelineFragmentListener;
 
     private ArrayList<Tweet> tweets;

@@ -25,6 +25,27 @@
 
     </android.support.v7.widget.Toolbar>
 
+    <com.astuetz.PagerSlidingTabStrip
+        android:id="@+id/tabs"
+        app:pstsShouldExpand="true"
+        app:pstsTextAllCaps="false"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:textSize="14sp"
+        app:pstsTabBackground="@drawable/statelist_tab_background"
+        android:textColor="@drawable/statelist_tab_text"
+        app:pstsUnderlineHeight="2dp"
+        app:pstsIndicatorHeight="4dp"
+        app:pstsIndicatorColor="#99777777"
+        >
+    </com.astuetz.PagerSlidingTabStrip>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/vpPager"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </android.support.v4.view.ViewPager>
+
 
     <FrameLayout android:id="@+id/flTimelineActivityFrame"
         android:layout_width="fill_parent"

@@ -57,7 +57,7 @@ public class TweetArrayAdapter extends ArrayAdapter<Tweet>{
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent){
-        Log.e("TWITTER", "tweetArrayAdapter.getView(position=" + position + ")");
+        //Log.e("TWITTER", "tweetArrayAdapter.getView(position=" + position + ")");
         final TweetViewHolder holder;
         if(convertView == null){
             //inflate new view
