@@ -1,6 +1,7 @@
 package com.codepath.apps.restclienttemplate.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -12,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.astuetz.PagerSlidingTabStrip;
@@ -68,15 +70,6 @@ public class TimelineActivity extends ActionBarActivity implements HomeTimelineF
 
         //replace actionbar with toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-
-        Button toolbarTitle = (Button)toolbar.findViewById(R.id.btnToolbarTitle);
-        toolbarTitle.setText("Home");
-//        toolbarTitle.setOnClickListener(new View.OnClickListener(){
-//            @Override
-//            public void onClick(View v){
-//                fetchNewerTweets();
-//            }
-//        });
         toolbar.setLogo(R.drawable.ic_launcher);
         setSupportActionBar(toolbar);
 
@@ -121,8 +114,45 @@ public class TimelineActivity extends ActionBarActivity implements HomeTimelineF
             ShowComposeTweetDialog(null);
             return true;
         }
+        if(id == R.id.action_profile){
+            ShowAuthenticatedUserProfile();
+        }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void ShowAuthenticatedUserProfile(){
+        if(User.authenticatedUser == null){
+            //we don't know the data about the auth'd user yet. fetch and remember
+            TwitterClient client = TwitterApplication.getTwitterClient();
+            if(!client.isNetworkAvailable()){
+                notifyNetworkUnavailable();
+                return;
+            }
+            client.getUserAccountInfo(new JsonHttpResponseHandler(){
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response){
+                    Log.d("TWITTER", "user credentials: " + response.toString());
+
+                    User.authenticatedUser = User.findOrCreateFromJson(response);
+                    ShowAuthenticatedUserProfileAfterAuthenticatedUserVerified();
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse){
+                    if(errorResponse != null){
+                        Log.e("TWITTER", "API Failure (user): " + errorResponse.toString(), throwable);
+                    }
+                    Toast.makeText(TimelineActivity.this, "API failure (user).", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }else{
+            ShowAuthenticatedUserProfileAfterAuthenticatedUserVerified();
+        }
+    }
+
+    private void ShowAuthenticatedUserProfileAfterAuthenticatedUserVerified(){
+        ShowProfileForUser(User.authenticatedUser);
     }
 
     public void ShowComposeTweetDialog(final Tweet inReplyToTweet){
@@ -154,8 +184,6 @@ public class TimelineActivity extends ActionBarActivity implements HomeTimelineF
         }else{
             ShowComposeTweetDialogAfterAuthenticatedUserVerified(inReplyToTweet);
         }
-
-
     }
 
     private void ShowComposeTweetDialogAfterAuthenticatedUserVerified(final Tweet inReplyToTweet){
@@ -194,8 +222,30 @@ public class TimelineActivity extends ActionBarActivity implements HomeTimelineF
         Toast.makeText(this, "No internet connection.", Toast.LENGTH_SHORT).show();
     }
 
+    boolean haveShownOfflineModeAlready = false;
+
+    /**
+     * Show a toast message saying we're in offline mode.
+     * Will only show one per lifetime of the activity unless repeat is set to true.
+     * @param repeat Whether to show it regardless of if it's been shown before or not.
+     */
+    @Override
+    public void ShowOfflineModeToast(boolean repeat){
+        if(!haveShownOfflineModeAlready || repeat){
+            Toast.makeText(this, "Offline mode.", Toast.LENGTH_SHORT).show();
+        }
+        this.haveShownOfflineModeAlready = true;
+    }
+
     @Override
     public Context getContext(){
         return this;
+    }
+
+    @Override
+    public void ShowProfileForUser(User user){
+        Intent i = new Intent(this, ProfileActivity.class);
+        i.putExtra(ProfileActivity.INTENT_EXTRA_USERID, user.getUserId());
+        startActivity(i);
     }
 }

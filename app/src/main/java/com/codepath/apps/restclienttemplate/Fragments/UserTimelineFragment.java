@@ -31,40 +31,47 @@ import java.util.Set;
 /**
  * Created by mekilah on 2/26/15.
  */
-public class HomeTimelineFragment extends TimelineFragment{
+public class UserTimelineFragment extends TimelineFragment{
 
-    public static final String TWEET_TIMELINE_TYPE = "home";
+    public static final String TWEET_TIMELINE_TYPE = "user";
 
-    private static long maxId = -1;
-    private static long sinceId = -1;
+    private long maxId = -1;
+    private long sinceId = -1;
 
-    /**
-     * Array of tweets posted by the user in this app's lifetime.
-     * Need this so on requests where we pull the newest tweets, we remove those tweets from the tweets array so they don't show twice.
-     */
-    private Map<Long, Tweet> userPostedTweetIds;
-
+    private String username;
 
     //req'd empty constructor
-    public HomeTimelineFragment(){
+    public UserTimelineFragment(){
         super();
     }
 
-    public static HomeTimelineFragment newInstance(){
-        HomeTimelineFragment homeTimelineFragment = new HomeTimelineFragment();
+    public static UserTimelineFragment newInstance(String username){
+        UserTimelineFragment userTimelineFragment = new UserTimelineFragment();
 
         //bundle
         //bundle.putInt
         //fragment.setarguments(bundle)
+        Bundle args = new Bundle();
+        args.putString("username", username);
+        userTimelineFragment.setArguments(args);
 
-        return homeTimelineFragment;
+        return userTimelineFragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+
+        this.username = getArguments().getString("username", null);
+        if(this.username == null){
+            Log.e("TWITTER", "null username received in onCreate of UserTimelineFragment.");
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState){
         View v = inflater.inflate(R.layout.fragment_timeline, container, false);
 
-        userPostedTweetIds = new HashMap<Long, Tweet>();
 
         lvFeed = (ListView)v.findViewById(R.id.lvTimelineFeed);
         tweets = new ArrayList<>();
@@ -81,24 +88,14 @@ public class HomeTimelineFragment extends TimelineFragment{
 
         setupSwipeToRefresh(v);
 
-        Log.e("TWITTER", "HomeTimelineFragment.onCreateView fetching more tweets");
-        fetchMoreTweets();
-
         return v;
     }
 
-    public void newTweetPostedByUser(Tweet post){
-        try{
-            userPostedTweetIds.put(post.getTweetId(), post);
-            tweets.add(0, post);
-            tweetArrayAdapter.notifyDataSetChanged();
-        }catch(Exception e){
-            Log.e("TWITTER", "error posting tweet", e);
-            Toast.makeText(this.timelineFragmentListener.getContext(), "Error with posted tweet", Toast.LENGTH_SHORT);
-            e.printStackTrace();
-        }
+    @Override
+    public void onStart(){
+        super.onStart();
+        fetchMoreTweets();
     }
-
 
     /**
      * uses sinceId to get newer tweets
@@ -112,46 +109,21 @@ public class HomeTimelineFragment extends TimelineFragment{
             swipeContainer.setRefreshing(false);
             return;
         }
-        client.getHomeTimeline(-1, sinceId, new JsonHttpResponseHandler(){
+        client.getUserTimelineByUsername(this.username, -1, sinceId, new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response){
-                Log.d("TWITTER", "timeline: " + response.toString());
+                Log.d("TWITTER", "user profile timeline: " + response.toString());
 
                 ArrayList<Tweet> newList = Tweet.fromJsonArray(response);
-                if(newList.size() <=0){
+                if(newList.size() <= 0){
                     Log.d("TWITTER", "fetchNewerTweets: no new tweets. response=" + response.toString());
-                    Toast.makeText(HomeTimelineFragment.this.timelineFragmentListener.getContext(), "No new tweets to show.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UserTimelineFragment.this.timelineFragmentListener.getContext(), "No new tweets to show.", Toast.LENGTH_SHORT).show();
                     swipeContainer.setRefreshing(false);
                     return;
                 }
                 sinceId = newList.get(0).getTweetId();
                 Log.d("TWITTER", "fetchNewerTweets: sinceId after fetch=" + sinceId);
 
-                for(int i=newList.size()-1; i >= 0; --i){
-                    //add tweets to beginning of list
-                    Log.d("TWITTER", "fetchNewerTweets: tweetId of item #" + i + " =" + newList.get(i).getTweetId());
-
-                    Map.Entry<Long, Tweet> duplicatedTweet = null;
-                    Set<Map.Entry<Long, Tweet>> entrySet = userPostedTweetIds.entrySet();
-
-                    for(Map.Entry<Long, Tweet> entry: entrySet){
-                        if(entry.getKey().longValue() == newList.get(i).getTweetId()){
-                            Log.w("TWITTER", "userPostedTweetId entry " + entry.getKey().longValue() + " is the same as newList[" + i + "]. removing old instance");
-                            duplicatedTweet = entry;
-                            break;
-                        }
-                    }
-
-                    if(duplicatedTweet != null){
-                        boolean removalSuccess = tweets.remove(duplicatedTweet.getValue());
-                        Log.w("TWITTER", "Removal from tweets success: " + removalSuccess);
-
-                        entrySet.remove(duplicatedTweet);
-                        Log.w("TWITTER", "Removal from userPostedTweetIds success: " + removalSuccess);
-                    }
-
-                    tweets.add(0, newList.get(i));
-                }
                 tweetArrayAdapter.notifyDataSetChanged();
                 swipeContainer.setRefreshing(false);
             }
@@ -162,7 +134,7 @@ public class HomeTimelineFragment extends TimelineFragment{
                 if(errorResponse != null){
                     Log.e("TWITTER", "API Failure (newer): " + errorResponse.toString(), throwable);
                 }
-                Toast.makeText(HomeTimelineFragment.this.timelineFragmentListener.getContext(), "API failure (newer).", Toast.LENGTH_SHORT).show();
+                Toast.makeText(UserTimelineFragment.this.timelineFragmentListener.getContext(), "API failure (newer).", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -174,7 +146,7 @@ public class HomeTimelineFragment extends TimelineFragment{
     public void fetchMoreTweets(){
         TwitterClient client = TwitterApplication.getTwitterClient();
         if(!client.isNetworkAvailable()){
-            Log.e("TWITTER","network unavailable i home:fetchMore. sinceId=" + sinceId);
+            Log.e("TWITTER","network unavailable i user:fetchMore. sinceId=" + sinceId);
             if(sinceId == -1){
                 //first try. load from db?
                 showOfflineTweets();
@@ -183,18 +155,18 @@ public class HomeTimelineFragment extends TimelineFragment{
             }
             return;
         }
-        client.getHomeTimeline(maxId, -1, new JsonHttpResponseHandler(){
+        client.getUserTimelineByUsername(this.username, maxId, -1, new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response){
-                Log.d("TWITTER", "timeline: " + response.toString());
+                Log.d("TWITTER", "user profile timeline: " + response.toString());
 
                 ArrayList<Tweet> newList = Tweet.fromJsonArray(response);
-                if(newList.size() <=0){
+                if(newList.size() <= 0){
                     Log.e("TWITTER", "Error: new list of tweets on fetchMoreTweets has bad size.");
-                    Toast.makeText(HomeTimelineFragment.this.timelineFragmentListener.getContext(), "Error fetching more tweets.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UserTimelineFragment.this.timelineFragmentListener.getContext(), "Error fetching more tweets.", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                maxId = newList.get(newList.size() -1).getTweetId() - 1;
+                maxId = newList.get(newList.size() - 1).getTweetId() - 1;
                 tweets.addAll(newList);
                 tweetArrayAdapter.notifyDataSetChanged();
 
@@ -214,14 +186,14 @@ public class HomeTimelineFragment extends TimelineFragment{
                     //first try. load from db?
                     showOfflineTweets();
                 }else{
-                    Toast.makeText(HomeTimelineFragment.this.timelineFragmentListener.getContext(), "API failure (more).", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UserTimelineFragment.this.timelineFragmentListener.getContext(), "API failure (more).", Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
 
     private void showOfflineTweets(){
-        List<Tweet> list = new Select().from(Tweet.class).where("forTimeline='" + HomeTimelineFragment.TWEET_TIMELINE_TYPE+"'").orderBy("tweetId DESC").execute();
+        List<Tweet> list = new Select().from(Tweet.class).where("forTimeline='" + UserTimelineFragment.TWEET_TIMELINE_TYPE+"'").orderBy("tweetId DESC").execute();
 
         if(list.size() > 0){
             tweetArrayAdapter.addAll(list);

@@ -1,5 +1,7 @@
 package com.codepath.apps.restclienttemplate.models;
 
+import android.util.Log;
+
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
@@ -123,7 +125,12 @@ public class Tweet extends Model{
                 continue;
             }
 
-            Tweet tweet = new Tweet(tweetJson);
+            Tweet tweet = new Tweet(tweetJson); if(tweet.getBody().contains("RT")){
+                Log.e("TWITTER", "RT'd tweet (timestamp str = " + tweet.getTimestampString() + ")body: ");
+                for(int k=0; k < tweetJson.toString().length(); k+=4000){
+                    Log.w("TWITTER", tweetJson.toString().substring(k, (k+4000 > tweetJson.toString().length() ? tweetJson.toString().length() : k + 4000)));
+                }
+            }
             tweet.save();
             tweets.add(tweet);
         }

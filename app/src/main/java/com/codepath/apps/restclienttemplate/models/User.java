@@ -27,6 +27,19 @@ public class User extends Model{
     @Column(name = "avatarURL")
     private String avatarURL;
 
+    @Column(name = "backgroundURL")
+    private String backgroundURL;
+
+    @Column(name = "postsCount")
+    private String postsCount;
+
+    @Column(name = "followersCount")
+    private String followersCount;
+
+    @Column(name = "followingCount")
+    private String followingCount;
+
+
     public User(){
         super();
     }
@@ -36,7 +49,10 @@ public class User extends Model{
             this.userId = User.getUserIdFromUserJson(userObj);
             this.username = userObj.getString(TwitterApi.RESPONSE_KEY_USERNAME);
             this.profilename = userObj.getString(TwitterApi.RESPONSE_KEY_PROFILENAME);
-            this.avatarURL = userObj.getString(TwitterApi.RESPONSE_KEY_PROFILE_IMAGE_URL);
+            this.avatarURL = userObj.getString(TwitterApi.RESPONSE_KEY_USER_PROFILE_IMAGE_URL);
+            this.postsCount = userObj.getString(TwitterApi.RESPONSE_KEY_USER_COUNT_POSTS);
+            this.followersCount = userObj.getString(TwitterApi.RESPONSE_KEY_USER_COUNT_FOLLOWERS);
+            this.followingCount = userObj.getString(TwitterApi.RESPONSE_KEY_USER_COUNT_FOLLOWING);
 
             //get bigger image from twitter
             this.avatarURL = this.avatarURL.replace("normal.", "bigger.");
@@ -78,32 +94,36 @@ public class User extends Model{
         return userId;
     }
 
-    public void setUserId(String userId){
-        this.userId = userId;
-    }
-
     public String getUsername(){
         return username;
-    }
-
-    public void setUsername(String username){
-        this.username = username;
     }
 
     public String getProfilename(){
         return profilename;
     }
 
-    public void setProfilename(String profilename){
-        this.profilename = profilename;
-    }
-
-
     public String getAvatarURL(){
         return avatarURL;
     }
 
-    public void setAvatarURL(String avatarURL){
-        this.avatarURL = avatarURL;
+    public String getPostsCount(){
+        return postsCount;
+    }
+
+    public String getFollowersCount(){
+        return followersCount;
+    }
+
+    public String getFollowingCount(){
+        return followingCount;
+    }
+
+    public String getBackgroundURL(){
+        return backgroundURL;
+    }
+
+    public void setBackgroundURL(String backgroundURL){
+        this.backgroundURL = backgroundURL;
+        this.save();
     }
 }

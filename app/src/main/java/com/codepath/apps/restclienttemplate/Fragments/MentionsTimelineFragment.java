@@ -57,7 +57,7 @@ public class MentionsTimelineFragment extends TimelineFragment{
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState){
-        View v = inflater.inflate(R.layout.fragment_timeline_home, container, false);
+        View v = inflater.inflate(R.layout.fragment_timeline, container, false);
 
         userPostedTweetIds = new HashMap<Long, Tweet>();
 
@@ -73,6 +73,8 @@ public class MentionsTimelineFragment extends TimelineFragment{
                 fetchMoreTweets();
             }
         });
+
+        setupSwipeToRefresh(v);
 
         return v;
     }
@@ -105,6 +107,7 @@ public class MentionsTimelineFragment extends TimelineFragment{
         TwitterClient client = TwitterApplication.getTwitterClient();
         if(!client.isNetworkAvailable()){
             notifyNetworkUnavailable();
+            swipeContainer.setRefreshing(false);
             return;
         }
         client.getMentionsTimeline(-1, sinceId, new JsonHttpResponseHandler(){
@@ -116,6 +119,7 @@ public class MentionsTimelineFragment extends TimelineFragment{
                 if(newList.size() <= 0){
                     Log.d("TWITTER", "mentions fetchNewerTweets: no new tweets. response=" + response.toString());
                     Toast.makeText(MentionsTimelineFragment.this.timelineFragmentListener.getContext(), "No new tweets to show.", Toast.LENGTH_SHORT).show();
+                    swipeContainer.setRefreshing(false);
                     return;
                 }
                 sinceId = newList.get(0).getTweetId();
@@ -147,10 +151,12 @@ public class MentionsTimelineFragment extends TimelineFragment{
                     tweets.add(0, newList.get(i));
                 }
                 tweetArrayAdapter.notifyDataSetChanged();
+                swipeContainer.setRefreshing(false);
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse){
+                swipeContainer.setRefreshing(false);
                 if(errorResponse != null){
                     Log.e("TWITTER", "mentions API Failure (newer): " + errorResponse.toString(), throwable);
                 }
@@ -217,9 +223,9 @@ public class MentionsTimelineFragment extends TimelineFragment{
         if(list.size() > 0){
             tweetArrayAdapter.addAll(list);
             sinceId = list.get(0).getTweetId();
-            Toast.makeText(this.timelineFragmentListener.getContext(), "Offline mode.", Toast.LENGTH_SHORT).show();
+            this.timelineFragmentListener.ShowOfflineModeToast(false);
         }else{
-            Toast.makeText(this.timelineFragmentListener.getContext(), "No offline tweets stored.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this.timelineFragmentListener.getContext(), "No offline mentions stored.", Toast.LENGTH_SHORT).show();
         }
     }
 }

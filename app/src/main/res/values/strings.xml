@@ -16,7 +16,9 @@
     <string name="unable_to_retweet">Unable to retweet.</string>
     <string name="unable_to_favorite">Failed to favorite tweet.</string>
 
-    <item type="id" name="favoriteOn"/>
-    <item type="id" name="favoriteOff"/>
+    <item name="favoriteOn" type="id"/>
+    <item name="favoriteOff" type="id"/>
+
+    <string name="title_activity_profile">Profile</string>
 
 </resources>

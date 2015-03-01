@@ -9,4 +9,11 @@
           app:showAsAction="always"
 
         />
+    <item android:id="@+id/action_profile"
+          android:title="My Profile"
+          android:icon="@drawable/ic_action_profile"
+          android:orderInCategory="150"
+          app:showAsAction="always"
+
+        />
 </menu>

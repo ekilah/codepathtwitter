@@ -12,17 +12,6 @@
         app:title=" "
         android:background="#ff00acee"
         >
-
-        <Button
-            android:id="@+id/btnToolbarTitle"
-            android:textColor="#FFFFFF"
-            android:clickable="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAllCaps="false"
-            android:background="@color/blue_button_toolbar"
-            />
-
     </android.support.v7.widget.Toolbar>
 
     <com.astuetz.PagerSlidingTabStrip

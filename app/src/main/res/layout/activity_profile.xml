@@ -1,0 +1,207 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="com.codepath.apps.restclienttemplate.activities.ProfileActivity"
+                android:orientation="vertical"
+
+    >
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:minHeight="?attr/actionBarSize"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:title=" "
+        android:background="#ff00acee"
+        >
+
+        <TextView
+            android:id="@+id/tvToolbarTitle"
+            android:textColor="#FFFFFF"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAllCaps="false"
+            android:text="Profile"
+            />
+
+    </android.support.v7.widget.Toolbar>
+
+
+    <RelativeLayout android:id="@+id/rlProfileBioArea"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:gravity="center_vertical"
+        android:background="@android:color/darker_gray"
+        >
+
+
+
+        <RelativeLayout android:id="@+id/rlProfileBioAreaAboveOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/profile_banner_overlay"
+            android:gravity="center_vertical"
+            >
+
+            <RelativeLayout android:id="@+id/rlProfileAvatarBg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="1dp"
+                android:paddingBottom="1dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:layout_centerHorizontal="true"
+                android:background="@android:color/white"
+                android:gravity="center_vertical"
+                >
+                <ImageView android:id="@+id/ivProfileAvatar"
+                           android:layout_width="50dp"
+                           android:layout_height="50dp"
+                           android:scaleType="fitCenter"
+                           tools:src="@drawable/ic_launcher"
+                           android:layout_marginBottom="5dp"
+                           android:layout_centerHorizontal="true"
+                           android:layout_centerVertical="true"
+
+                    />
+
+                </RelativeLayout>
+
+
+            <TextView android:id="@+id/tvProfileDisplayName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                tools:text="My cool profile name"
+                android:layout_below="@id/rlProfileAvatarBg"
+                android:layout_centerHorizontal="true"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+
+                />
+            <TextView android:id="@+id/tvProfileUsername"
+                android:layout_below="@id/tvProfileDisplayName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                tools:text="\@coolprofile123"
+                android:layout_centerHorizontal="true"
+                android:textColor="#FFFFFF"
+
+                />
+            </RelativeLayout>
+        </RelativeLayout>
+    <LinearLayout android:id="@+id/rlProfileInfoBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/rlProfileBioArea"
+        android:orientation="horizontal"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:divider="?android:listDivider"
+        android:showDividers="middle"
+
+        >
+
+        <LinearLayout android:id="@+id/llProfileCounterTweets"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginLeft="8dp"
+            android:orientation="vertical"
+
+            >
+            <TextView android:id="@+id/tvProfileCounterTweetsCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:textColor="@android:color/black"
+                android:textStyle="bold"
+                tools:text="5548"
+                />
+            <TextView android:id="@+id/tvProfileCounterTweetsLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="Tweets"
+                android:textColor="@android:color/black"
+                android:textAllCaps="true"
+                />
+
+            </LinearLayout>
+
+        <LinearLayout android:id="@+id/llProfileCounterFollowing"
+                      android:layout_width="0dp"
+                      android:layout_height="wrap_content"
+                      android:layout_weight="1"
+                      android:orientation="vertical"
+                      android:layout_marginLeft="8dp"
+
+
+            >
+            <TextView android:id="@+id/tvProfileCounterFollowingCount"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:singleLine="true"
+                      android:textColor="@android:color/black"
+                      android:textStyle="bold"
+                      tools:text="48"
+                />
+            <TextView android:id="@+id/tvProfileCounterFollowingLabel"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:singleLine="true"
+                      android:text="Following"
+                      android:textColor="@android:color/black"
+                      android:textAllCaps="true"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/llProfileCounterFollowers"
+                      android:layout_width="0dp"
+                      android:layout_height="wrap_content"
+                      android:layout_weight="1"
+                      android:orientation="vertical"
+                      android:layout_marginLeft="8dp"
+
+
+            >
+            <TextView android:id="@+id/tvProfileCounterFollowersCount"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:singleLine="true"
+                      android:textColor="@android:color/black"
+                      android:textStyle="bold"
+                      tools:text="374563546"
+                />
+            <TextView android:id="@+id/tvProfileCounterFollowersLabel"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:singleLine="true"
+                      android:text="Followers"
+                      android:textColor="@android:color/black"
+                      android:textAllCaps="true"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/SplitLine_hor1"
+        android:layout_width="match_parent"
+        android:layout_height= "1.5dp"
+        android:background="@android:color/darker_gray" />
+
+    <FrameLayout android:id="@+id/flProfileActivityFrame"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        </FrameLayout>
+
+</LinearLayout>

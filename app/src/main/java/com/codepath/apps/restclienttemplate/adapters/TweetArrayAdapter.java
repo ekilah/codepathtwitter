@@ -19,6 +19,7 @@ import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.TwitterApplication;
 import com.codepath.apps.restclienttemplate.TwitterClient;
 import com.codepath.apps.restclienttemplate.fragments.HomeTimelineFragment;
+import com.codepath.apps.restclienttemplate.fragments.TimelineFragment;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.squareup.picasso.Picasso;
@@ -36,9 +37,9 @@ import java.util.Locale;
  * Created by mekilah on 2/19/15.
  */
 public class TweetArrayAdapter extends ArrayAdapter<Tweet>{
-    private HomeTimelineFragment.TimelineFragmentListener timelineFragmentListener;
+    private TimelineFragment.TimelineFragmentListener timelineFragmentListener;
 
-    public TweetArrayAdapter(Context context, HomeTimelineFragment.TimelineFragmentListener callingActivity, List<Tweet> objects){
+    public TweetArrayAdapter(Context context, TimelineFragment.TimelineFragmentListener callingActivity, List<Tweet> objects){
         super(context, R.layout.timeline_item, objects);
         this.timelineFragmentListener = callingActivity;
     }
@@ -76,9 +77,18 @@ public class TweetArrayAdapter extends ArrayAdapter<Tweet>{
         }
 
         Picasso.with(getContext()).load(getItem(position).getPoster().getAvatarURL()).into(holder.ivPosterAvatar);
+        holder.ivPosterAvatar.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Log.i("TWITTER", "requesting profile for clicked image of user: @" + getItem(position).getPoster().getUsername());
+                TweetArrayAdapter.this.timelineFragmentListener.ShowProfileForUser(getItem(position).getPoster());
+            }
+        });
+
         holder.tvUsername.setText("@" + getItem(position).getPoster().getUsername());
         holder.tvProfilename.setText(getItem(position).getPoster().getProfilename());
         holder.tvBody.setText(Html.fromHtml(getItem(position).getBody()));
+
         holder.tvTimestamp.setText(this.getRelativeTimeAgo(getItem(position).getTimestampString()));
 
         holder.tvRetweet.setText(NumberFormat.getNumberInstance(convertView.getResources().getConfiguration().locale).format(getItem(position).getRetweetCount()));
@@ -208,9 +218,14 @@ public class TweetArrayAdapter extends ArrayAdapter<Tweet>{
             return getContext().getString(R.string.unknown);
         }
 
+        long numHrs = (currentTime - tweetTime)/1000/3600;
+
         if(tweetTime >= currentTime){
             //due to small differences in times, this probably means the tweet just happened.
             return getContext().getString(R.string.moments_ago);
+        }else if(numHrs  > 24 &&  numHrs < 48){
+            Log.w("TWITTER", "timestamp for yesterday being set=1d");
+            return "1d";
         }
 
         relativeDate = DateUtils.getRelativeTimeSpanString(tweetTime, currentTime, DateUtils.SECOND_IN_MILLIS).toString();

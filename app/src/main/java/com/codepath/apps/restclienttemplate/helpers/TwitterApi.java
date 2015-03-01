@@ -10,7 +10,6 @@ public class TwitterApi{
     public static final String RESPONSE_KEY_PROFILENAME = "name";
     public static final String RESPONSE_KEY_USERNAME = "screen_name";
     public static final String RESPONSE_KEY_TIMESTAMP = "created_at";
-    public static final String RESPONSE_KEY_PROFILE_IMAGE_URL = "profile_image_url";
     public static final String RESPONSE_KEY_TEXT = "text";
 
     public static final String RESPONSE_KEY_RETWEET_COUNT = "retweet_count";
@@ -18,6 +17,13 @@ public class TwitterApi{
 
     public static final String RESPONSE_KEY_USER_FAVORITED = "favorited";
     public static final String RESPONSE_KEY_USER_RETWEETED = "retweeted";
+    public static final String RESPONSE_KEY_USER_COUNT_POSTS = "statuses_count";
+    public static final String RESPONSE_KEY_USER_COUNT_FOLLOWERS = "followers_count";
+    public static final String RESPONSE_KEY_USER_COUNT_FOLLOWING = "friends_count";
+    public static final String RESPONSE_KEY_USER_PROFILE_IMAGE_URL = "profile_image_url";
+    public static final String RESPONSE_KEY_USER_PROFILE_BANNER_IMAGE_SIZES = "sizes";
+    public static final String RESPONSE_KEY_USER_PROFILE_BANNER_IMAGE_URL = "url";
+    public static final String RESPONSE_KEY_USER_PROFILE_BANNER_IMAGE_MOBILE = "mobile_retina";
 
     public static final int TWEET_CHARACTER_LIMIT = 140;
 
