@@ -10,11 +10,11 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.codepath.apps.restclienttemplate.R;
-import com.codepath.apps.restclienttemplate.RestClient;
+import com.codepath.apps.restclienttemplate.TwitterClient;
 import com.codepath.oauth.OAuthLoginActionBarActivity;
 import com.squareup.picasso.Picasso;
 
-public class LoginActivity extends OAuthLoginActionBarActivity<RestClient> {
+public class LoginActivity extends OAuthLoginActionBarActivity<TwitterClient> {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

@@ -31,9 +31,10 @@ import java.util.Set;
 /**
  * Created by mekilah on 2/26/15.
  */
-public class HomeTimelineFragment extends TimelineFragment{
+public class MentionsTimelineFragment extends TimelineFragment{
 
-    public static final String TWEET_TIMELINE_TYPE = "home";
+    public static final String TWEET_TIMELINE_TYPE = "mentions";
+
 
     private static long maxId = -1;
     private static long sinceId = -1;
@@ -44,20 +45,14 @@ public class HomeTimelineFragment extends TimelineFragment{
      */
     private Map<Long, Tweet> userPostedTweetIds;
 
-
-    //req'd empty constructor
-    public HomeTimelineFragment(){
-        super();
-    }
-
-    public static HomeTimelineFragment newInstance(){
-        HomeTimelineFragment homeTimelineFragment = new HomeTimelineFragment();
+    public static MentionsTimelineFragment newInstance(){
+        MentionsTimelineFragment mentionsTimelineFragment = new MentionsTimelineFragment();
 
         //bundle
         //bundle.putInt
         //fragment.setarguments(bundle)
 
-        return homeTimelineFragment;
+        return mentionsTimelineFragment;
     }
 
     @Override
@@ -94,7 +89,7 @@ public class HomeTimelineFragment extends TimelineFragment{
             tweets.add(0, post);
             tweetArrayAdapter.notifyDataSetChanged();
         }catch(Exception e){
-            Log.e("TWITTER", "error posting tweet", e);
+            Log.e("TWITTER", "mentions error posting tweet", e);
             Toast.makeText(this.timelineFragmentListener.getContext(), "Error with posted tweet", Toast.LENGTH_SHORT);
             e.printStackTrace();
         }
@@ -106,36 +101,36 @@ public class HomeTimelineFragment extends TimelineFragment{
      */
     @Override
     public void fetchNewerTweets(){
-        Log.d("TWITTER", "fetchNewerTweets: sinceId on entry=" + sinceId);
+        Log.d("TWITTER", "mentions fetchNewerTweets: sinceId on entry=" + sinceId);
         TwitterClient client = TwitterApplication.getTwitterClient();
         if(!client.isNetworkAvailable()){
             notifyNetworkUnavailable();
             return;
         }
-        client.getHomeTimeline(-1, sinceId, new JsonHttpResponseHandler(){
+        client.getMentionsTimeline(-1, sinceId, new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response){
-                Log.d("TWITTER", "timeline: " + response.toString());
+                Log.d("TWITTER", "mentions timeline: " + response.toString());
 
-                ArrayList<Tweet> newList = Tweet.fromJsonArray(response);
-                if(newList.size() <=0){
-                    Log.d("TWITTER", "fetchNewerTweets: no new tweets. response=" + response.toString());
-                    Toast.makeText(HomeTimelineFragment.this.timelineFragmentListener.getContext(), "No new tweets to show.", Toast.LENGTH_SHORT).show();
+                ArrayList<Tweet> newList = Tweet.fromJsonArray(response, MentionsTimelineFragment.TWEET_TIMELINE_TYPE);
+                if(newList.size() <= 0){
+                    Log.d("TWITTER", "mentions fetchNewerTweets: no new tweets. response=" + response.toString());
+                    Toast.makeText(MentionsTimelineFragment.this.timelineFragmentListener.getContext(), "No new tweets to show.", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 sinceId = newList.get(0).getTweetId();
-                Log.d("TWITTER", "fetchNewerTweets: sinceId after fetch=" + sinceId);
+                Log.d("TWITTER", "mentions fetchNewerTweets: sinceId after fetch=" + sinceId);
 
-                for(int i=newList.size()-1; i >= 0; --i){
+                for(int i = newList.size() - 1; i >= 0; --i){
                     //add tweets to beginning of list
-                    Log.d("TWITTER", "fetchNewerTweets: tweetId of item #" + i + " =" + newList.get(i).getTweetId());
+                    Log.d("TWITTER", "mentions fetchNewerTweets: tweetId of item #" + i + " =" + newList.get(i).getTweetId());
 
                     Map.Entry<Long, Tweet> duplicatedTweet = null;
                     Set<Map.Entry<Long, Tweet>> entrySet = userPostedTweetIds.entrySet();
 
-                    for(Map.Entry<Long, Tweet> entry: entrySet){
+                    for(Map.Entry<Long, Tweet> entry : entrySet){
                         if(entry.getKey().longValue() == newList.get(i).getTweetId()){
-                            Log.w("TWITTER", "userPostedTweetId entry " + entry.getKey().longValue() + " is the same as newList[" + i + "]. removing old instance");
+                            Log.w("TWITTER", "mentions userPostedTweetId entry " + entry.getKey().longValue() + " is the same as newList[" + i + "]. removing old instance");
                             duplicatedTweet = entry;
                             break;
                         }
@@ -143,10 +138,10 @@ public class HomeTimelineFragment extends TimelineFragment{
 
                     if(duplicatedTweet != null){
                         boolean removalSuccess = tweets.remove(duplicatedTweet.getValue());
-                        Log.w("TWITTER", "Removal from tweets success: " + removalSuccess);
+                        Log.w("TWITTER", "mentions Removal from tweets success: " + removalSuccess);
 
                         entrySet.remove(duplicatedTweet);
-                        Log.w("TWITTER", "Removal from userPostedTweetIds success: " + removalSuccess);
+                        Log.w("TWITTER", "mentions Removal from userPostedTweetIds success: " + removalSuccess);
                     }
 
                     tweets.add(0, newList.get(i));
@@ -157,9 +152,9 @@ public class HomeTimelineFragment extends TimelineFragment{
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse){
                 if(errorResponse != null){
-                    Log.e("TWITTER", "API Failure (newer): " + errorResponse.toString(), throwable);
+                    Log.e("TWITTER", "mentions API Failure (newer): " + errorResponse.toString(), throwable);
                 }
-                Toast.makeText(HomeTimelineFragment.this.timelineFragmentListener.getContext(), "API failure (newer).", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MentionsTimelineFragment.this.timelineFragmentListener.getContext(), "API failure (newer mentions).", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -171,7 +166,6 @@ public class HomeTimelineFragment extends TimelineFragment{
     public void fetchMoreTweets(){
         TwitterClient client = TwitterApplication.getTwitterClient();
         if(!client.isNetworkAvailable()){
-            Log.e("TWITTER","network unavailable i home:fetchMore. sinceId=" + sinceId);
             if(sinceId == -1){
                 //first try. load from db?
                 showOfflineTweets();
@@ -180,18 +174,18 @@ public class HomeTimelineFragment extends TimelineFragment{
             }
             return;
         }
-        client.getHomeTimeline(maxId, -1, new JsonHttpResponseHandler(){
+        client.getMentionsTimeline(maxId, -1, new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response){
-                Log.d("TWITTER", "timeline: " + response.toString());
+                Log.d("TWITTER", "mentions timeline: " + response.toString());
 
-                ArrayList<Tweet> newList = Tweet.fromJsonArray(response);
-                if(newList.size() <=0){
-                    Log.e("TWITTER", "Error: new list of tweets on fetchMoreTweets has bad size.");
-                    Toast.makeText(HomeTimelineFragment.this.timelineFragmentListener.getContext(), "Error fetching more tweets.", Toast.LENGTH_SHORT).show();
+                ArrayList<Tweet> newList = Tweet.fromJsonArray(response, MentionsTimelineFragment.TWEET_TIMELINE_TYPE);
+                if(newList.size() <= 0){
+                    Log.e("TWITTER", "mentions Error: new list of tweets on fetchMoreTweets has bad size.");
+                    Toast.makeText(MentionsTimelineFragment.this.timelineFragmentListener.getContext(), "Error fetching more mentions tweets.", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                maxId = newList.get(newList.size() -1).getTweetId() - 1;
+                maxId = newList.get(newList.size() - 1).getTweetId() - 1;
                 tweets.addAll(newList);
                 tweetArrayAdapter.notifyDataSetChanged();
 
@@ -204,21 +198,21 @@ public class HomeTimelineFragment extends TimelineFragment{
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse){
                 if(errorResponse != null){
-                    Log.e("TWITTER", "API Failure (more): " + errorResponse.toString(), throwable);
+                    Log.e("TWITTER", "API Failure (more mentions): " + errorResponse.toString(), throwable);
                 }
 
                 if(sinceId == -1){
                     //first try. load from db?
                     showOfflineTweets();
                 }else{
-                    Toast.makeText(HomeTimelineFragment.this.timelineFragmentListener.getContext(), "API failure (more).", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MentionsTimelineFragment.this.timelineFragmentListener.getContext(), "API failure (more mentions).", Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
 
     private void showOfflineTweets(){
-        List<Tweet> list = new Select().from(Tweet.class).where("forTimeline='" + HomeTimelineFragment.TWEET_TIMELINE_TYPE+"'").orderBy("tweetId DESC").execute();
+        List<Tweet> list = new Select().from(Tweet.class).where("forTimeline='" + MentionsTimelineFragment.TWEET_TIMELINE_TYPE+"'").orderBy("tweetId DESC").execute();
 
         if(list.size() > 0){
             tweetArrayAdapter.addAll(list);

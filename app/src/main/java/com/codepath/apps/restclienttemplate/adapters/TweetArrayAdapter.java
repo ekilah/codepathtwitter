@@ -15,10 +15,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.codepath.apps.restclienttemplate.activities.TimelineActivity;
 import com.codepath.apps.restclienttemplate.R;
-import com.codepath.apps.restclienttemplate.RestApplication;
-import com.codepath.apps.restclienttemplate.RestClient;
+import com.codepath.apps.restclienttemplate.TwitterApplication;
+import com.codepath.apps.restclienttemplate.TwitterClient;
 import com.codepath.apps.restclienttemplate.fragments.HomeTimelineFragment;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -100,7 +99,7 @@ public class TweetArrayAdapter extends ArrayAdapter<Tweet>{
                 @Override
                 public void onClick(final View v){
 
-                    RestClient client = RestApplication.getRestClient();
+                    TwitterClient client = TwitterApplication.getTwitterClient();
                     if(!client.isNetworkAvailable()){
                         Toast.makeText(getContext(), "No internet connection.", Toast.LENGTH_SHORT).show();
                         return;
@@ -150,7 +149,7 @@ public class TweetArrayAdapter extends ArrayAdapter<Tweet>{
 
                 final boolean isBeingFavorited = !getItem(position).posterFavorited();
 
-                RestClient client = RestApplication.getRestClient();
+                TwitterClient client = TwitterApplication.getTwitterClient();
                 if(!client.isNetworkAvailable()){
                     Toast.makeText(getContext(), "No internet connection.", Toast.LENGTH_SHORT).show();
                     return;

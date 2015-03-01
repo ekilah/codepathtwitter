@@ -39,6 +39,9 @@ public class Tweet extends Model{
     @Column(name = "tweetId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
     private long tweetId;
 
+    @Column(name = "forTimeline", notNull = true)
+    private String timelineType = "home";
+
     //required empty constructor for activeandroid
     public Tweet(){
         super();
@@ -52,6 +55,21 @@ public class Tweet extends Model{
         //req'd by activeandroid
         super();
 
+        updateFromJson(tweetObj);
+    }
+
+    /**
+     * Construct tweet object from JSON response
+     * @param tweetObj JSON object from API representing a tweet
+     * @param timelineType The timeline this tweet is associated with (default='home') - used for separating timelines
+     */
+    public Tweet(JSONObject tweetObj, String timelineType){
+        //req'd by activeandroid
+        super();
+
+        if(timelineType != null && timelineType.length() > 0){
+            this.timelineType = timelineType;
+        }
         updateFromJson(tweetObj);
     }
 
@@ -73,7 +91,27 @@ public class Tweet extends Model{
         }
     }
 
-    public static ArrayList<Tweet> fromJson(JSONArray jsonArray) {
+    public static ArrayList<Tweet> fromJsonArray(JSONArray jsonArray, String timelineType){
+        ArrayList<Tweet> tweets = new ArrayList<Tweet>(jsonArray.length());
+
+        for (int i=0; i < jsonArray.length(); i++) {
+            JSONObject tweetJson;
+            try {
+                tweetJson = jsonArray.getJSONObject(i);
+            } catch (Exception e) {
+                e.printStackTrace();
+                continue;
+            }
+
+            Tweet tweet = new Tweet(tweetJson, timelineType);
+            tweet.save();
+            tweets.add(tweet);
+        }
+
+        return tweets;
+    }
+
+    public static ArrayList<Tweet> fromJsonArray(JSONArray jsonArray) {
         ArrayList<Tweet> tweets = new ArrayList<Tweet>(jsonArray.length());
 
         for (int i=0; i < jsonArray.length(); i++) {

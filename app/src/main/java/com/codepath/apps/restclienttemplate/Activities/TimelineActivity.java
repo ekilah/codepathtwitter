@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -12,38 +11,31 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.Toast;
 
-import com.activeandroid.query.Select;
 import com.astuetz.PagerSlidingTabStrip;
+import com.codepath.apps.restclienttemplate.TwitterApplication;
 import com.codepath.apps.restclienttemplate.fragments.ComposeTweetFragment;
 import com.codepath.apps.restclienttemplate.R;
-import com.codepath.apps.restclienttemplate.RestApplication;
-import com.codepath.apps.restclienttemplate.RestClient;
-import com.codepath.apps.restclienttemplate.adapters.TweetArrayAdapter;
+import com.codepath.apps.restclienttemplate.TwitterClient;
 import com.codepath.apps.restclienttemplate.fragments.HomeTimelineFragment;
-import com.codepath.apps.restclienttemplate.helpers.EndlessScrollListener;
+import com.codepath.apps.restclienttemplate.fragments.MentionsTimelineFragment;
+import com.codepath.apps.restclienttemplate.fragments.TimelineFragment;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.codepath.apps.restclienttemplate.models.User;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.apache.http.Header;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class TimelineActivity extends ActionBarActivity implements HomeTimelineFragment.TimelineFragmentListener{
 
     HomeTimelineFragment homeTimelineFragment;
-    ArrayList<HomeTimelineFragment> fragments;
+    MentionsTimelineFragment mentionsTimelineFragment;
+    ArrayList<TimelineFragment> fragments;
     ViewPager viewPager;
     TimelinePagerAdapter timelinePagerAdapter;
 
@@ -94,8 +86,12 @@ public class TimelineActivity extends ActionBarActivity implements HomeTimelineF
 //        transaction.replace(R.id.flTimelineActivityFrame, homeTimelineFragment);
 //        transaction.commit();
 
+        mentionsTimelineFragment = MentionsTimelineFragment.newInstance();
+        mentionsTimelineFragment.visibleTitle = "Mentions";
+
         fragments = new ArrayList<>(2);
         fragments.add(homeTimelineFragment);
+        fragments.add(mentionsTimelineFragment);
 
         viewPager = (ViewPager) findViewById(R.id.vpPager);
         timelinePagerAdapter = new TimelinePagerAdapter(getSupportFragmentManager());
@@ -133,7 +129,7 @@ public class TimelineActivity extends ActionBarActivity implements HomeTimelineF
 
         if(User.authenticatedUser == null){
             //we don't know the data about the auth'd user yet. fetch and remember
-            RestClient client = RestApplication.getRestClient();
+            TwitterClient client = TwitterApplication.getTwitterClient();
             if(!client.isNetworkAvailable()){
                 notifyNetworkUnavailable();
                 return;
@@ -174,7 +170,7 @@ public class TimelineActivity extends ActionBarActivity implements HomeTimelineF
     }
 
     public void SendTweet(final String tweetBody, Tweet inReplyToTweet){
-        RestClient client = RestApplication.getRestClient();
+        TwitterClient client = TwitterApplication.getTwitterClient();
         if(!client.isNetworkAvailable()){
             notifyNetworkUnavailable();
             return;
