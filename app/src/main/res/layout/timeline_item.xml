@@ -11,8 +11,32 @@
                 android:paddingBottom="10dp"
 
     >
+    <LinearLayout android:id="@+id/llRetweetInfoBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_toRightOf="@+id/ivTimelineItemPosterAvatar"
+
+
+        >
+
+        <TextView android:id="@+id/tvRetweetedBy"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  tools:drawableLeft="@android:drawable/ic_popup_sync"
+                  tools:drawableStart="@android:drawable/ic_popup_sync"
+                  android:clickable="true"
+                  tools:text="Monroe retweeted"
+                  android:textSize="9dp"
+                  android:gravity="left|center_vertical"
+                  android:drawablePadding="5dp"
+
+
+            />
+        </LinearLayout>
 
     <ImageView android:id="@+id/ivTimelineItemPosterAvatar"
+        android:layout_below="@id/llRetweetInfoBar"
         android:layout_width="50dp"
         android:layout_height="50dp"
         tools:src="@drawable/ic_launcher"

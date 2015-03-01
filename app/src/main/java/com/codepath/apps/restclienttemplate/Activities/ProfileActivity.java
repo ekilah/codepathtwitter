@@ -23,6 +23,7 @@ import com.activeandroid.query.Select;
 import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.TwitterApplication;
 import com.codepath.apps.restclienttemplate.TwitterClient;
+import com.codepath.apps.restclienttemplate.fragments.ComposeTweetFragment;
 import com.codepath.apps.restclienttemplate.fragments.TimelineFragment;
 import com.codepath.apps.restclienttemplate.fragments.UserTimelineFragment;
 import com.codepath.apps.restclienttemplate.helpers.TwitterApi;
@@ -161,10 +162,72 @@ public class ProfileActivity extends ActionBarActivity implements TimelineFragme
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void ShowComposeTweetDialog(Tweet inReplyToTweet){
-        //can't do this here.
-        Log.e("TWITTER", "trying to show compose tweet dialog in profile activity.");
+    public void notifyNetworkUnavailable(){
+        Toast.makeText(this, "No internet connection.", Toast.LENGTH_SHORT).show();
+    }
+
+    public void ShowComposeTweetDialog(final Tweet inReplyToTweet){
+
+        if(User.authenticatedUser == null){
+            //we don't know the data about the auth'd user yet. fetch and remember
+            TwitterClient client = TwitterApplication.getTwitterClient();
+            if(!client.isNetworkAvailable()){
+                notifyNetworkUnavailable();
+                return;
+            }
+            client.getUserAccountInfo(new JsonHttpResponseHandler(){
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response){
+                    Log.d("TWITTER", "user credentials: " + response.toString());
+
+                    User.authenticatedUser = User.findOrCreateFromJson(response);
+                    ShowComposeTweetDialogAfterAuthenticatedUserVerified(inReplyToTweet);
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse){
+                    if(errorResponse != null){
+                        Log.e("TWITTER", "API Failure (user): " + errorResponse.toString(), throwable);
+                    }
+                    Toast.makeText(ProfileActivity.this, "API failure (user).", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }else{
+            ShowComposeTweetDialogAfterAuthenticatedUserVerified(inReplyToTweet);
+        }
+    }
+
+    private void ShowComposeTweetDialogAfterAuthenticatedUserVerified(final Tweet inReplyToTweet){
+        ComposeTweetFragment composeTweetFragment = ComposeTweetFragment.newInstance(inReplyToTweet);
+        composeTweetFragment.addComposeTweetFragmentListener(new ComposeTweetFragment.ComposeTweetFragmentListener(){
+            @Override
+            public void onSendTweet(String tweetBody){
+                ProfileActivity.this.SendTweet(tweetBody, inReplyToTweet);
+            }
+        });
+        composeTweetFragment.show(getSupportFragmentManager(), "fragment_compose_tweet");
+    }
+
+    public void SendTweet(final String tweetBody, Tweet inReplyToTweet){
+        TwitterClient client = TwitterApplication.getTwitterClient();
+        if(!client.isNetworkAvailable()){
+            notifyNetworkUnavailable();
+            return;
+        }
+        client.postTweet(tweetBody, new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response){
+                //response is a Tweet object representing the tweet we sent out
+                //Tweet post = new Tweet(response);
+                //TimelineActivity.this.homeTimelineFragment.newTweetPostedByUser(post);
+                Toast.makeText(ProfileActivity.this, "Tweet posted", Toast.LENGTH_SHORT);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable){
+                Toast.makeText(ProfileActivity.this, "Tweet failed to post", Toast.LENGTH_SHORT);
+            }
+        }, (inReplyToTweet == null ? -1 : inReplyToTweet.getTweetId()));
     }
 
     @Override

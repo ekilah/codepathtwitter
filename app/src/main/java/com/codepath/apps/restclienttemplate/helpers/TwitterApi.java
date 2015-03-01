@@ -11,6 +11,7 @@ public class TwitterApi{
     public static final String RESPONSE_KEY_USERNAME = "screen_name";
     public static final String RESPONSE_KEY_TIMESTAMP = "created_at";
     public static final String RESPONSE_KEY_TEXT = "text";
+    public static final String RESPONSE_KEY_RETWEETED_ORIGINAL = "retweeted_status";
 
     public static final String RESPONSE_KEY_RETWEET_COUNT = "retweet_count";
     public static final String RESPONSE_KEY_FAVORITE_COUNT = "favorite_count";

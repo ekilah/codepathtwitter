@@ -44,6 +44,12 @@ public class Tweet extends Model{
     @Column(name = "forTimeline", notNull = true)
     private String timelineType = "home";
 
+    @Column(name = "isRetweet")
+    private boolean isRetweet;
+
+    @Column(name = "retweeter")
+    private User retweeter;
+
     //required empty constructor for activeandroid
     public Tweet(){
         super();
@@ -77,14 +83,30 @@ public class Tweet extends Model{
 
     public void updateFromJson(JSONObject tweetObj){
         try {
-            this.timestampString = tweetObj.getString(TwitterApi.RESPONSE_KEY_TIMESTAMP);
-            this.body = tweetObj.getString(TwitterApi.RESPONSE_KEY_TEXT);
-            this.posterFavorited = tweetObj.getBoolean(TwitterApi.RESPONSE_KEY_USER_FAVORITED);
-            this.posterRetweeted = tweetObj.getBoolean(TwitterApi.RESPONSE_KEY_USER_RETWEETED);
-            this.favoriteCount = tweetObj.getLong(TwitterApi.RESPONSE_KEY_FAVORITE_COUNT);
+            JSONObject retweetedOriginalObj = tweetObj.optJSONObject(TwitterApi.RESPONSE_KEY_RETWEETED_ORIGINAL);
+            if(retweetedOriginalObj != null){
+                this.isRetweet = true;
+                JSONObject retweeterObj = retweetedOriginalObj.getJSONObject(TwitterApi.RESPONSE_KEY_USER);
+                this.retweeter = User.findOrCreateFromJson(retweeterObj);
+
+                this.timestampString = retweetedOriginalObj.getString(TwitterApi.RESPONSE_KEY_TIMESTAMP);
+                this.body = retweetedOriginalObj.getString(TwitterApi.RESPONSE_KEY_TEXT);
+                this.posterFavorited = retweetedOriginalObj.getBoolean(TwitterApi.RESPONSE_KEY_USER_FAVORITED);
+                this.posterRetweeted = retweetedOriginalObj.getBoolean(TwitterApi.RESPONSE_KEY_USER_RETWEETED);
+                this.favoriteCount = retweetedOriginalObj.getLong(TwitterApi.RESPONSE_KEY_FAVORITE_COUNT);
+
+            }else{
+                this.isRetweet = false;
+                this.retweeter = null;
+                this.timestampString = tweetObj.getString(TwitterApi.RESPONSE_KEY_TIMESTAMP);
+                this.body = tweetObj.getString(TwitterApi.RESPONSE_KEY_TEXT);
+                this.posterFavorited = tweetObj.getBoolean(TwitterApi.RESPONSE_KEY_USER_FAVORITED);
+                this.posterRetweeted = tweetObj.getBoolean(TwitterApi.RESPONSE_KEY_USER_RETWEETED);
+                this.favoriteCount = tweetObj.getLong(TwitterApi.RESPONSE_KEY_FAVORITE_COUNT);
+            }
+
             this.retweetCount = tweetObj.getLong(TwitterApi.RESPONSE_KEY_RETWEET_COUNT);
             this.tweetId = tweetObj.getLong(TwitterApi.RESPONSE_KEY_ID);
-
             JSONObject userObj = tweetObj.getJSONObject(TwitterApi.RESPONSE_KEY_USER);
             this.poster = User.findOrCreateFromJson(userObj);
 
@@ -155,12 +177,16 @@ public class Tweet extends Model{
     }
 
     public User getPoster(){
+        if(this.isRetweet){
+            return this.retweeter;
+        }
         return poster;
     }
 
-    public void setPoster(User poster){
-        this.poster = poster;
+    public User getPosterNotRetweeter(){
+        return poster;
     }
+
 
     public boolean posterFavorited(){
         return posterFavorited;
@@ -201,5 +227,17 @@ public class Tweet extends Model{
 
     public void setTweetId(long tweetId){
         this.tweetId = tweetId;
+    }
+
+    public String getTimelineType(){
+        return timelineType;
+    }
+
+    public boolean isRetweet(){
+        return isRetweet;
+    }
+
+    public User getRetweeter(){
+        return retweeter;
     }
 }

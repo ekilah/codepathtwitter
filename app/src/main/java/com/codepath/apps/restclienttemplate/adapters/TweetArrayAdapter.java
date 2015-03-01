@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +27,7 @@ import com.squareup.picasso.Picasso;
 
 import org.apache.http.Header;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -53,6 +55,8 @@ public class TweetArrayAdapter extends ArrayAdapter<Tweet>{
         TextView tvReply;
         TextView tvRetweet;
         TextView tvFavorite;
+        LinearLayout llRetweetInfoBar;
+        TextView tvRetweetedBy;
     }
 
     @Override
@@ -71,6 +75,8 @@ public class TweetArrayAdapter extends ArrayAdapter<Tweet>{
             holder.tvReply = (TextView) convertView.findViewById(R.id.tvReply);
             holder.tvRetweet = (TextView) convertView.findViewById(R.id.tvRetweet);
             holder.tvFavorite = (TextView) convertView.findViewById(R.id.tvFavorite);
+            holder.llRetweetInfoBar = (LinearLayout) convertView.findViewById(R.id.llRetweetInfoBar);
+            holder.tvRetweetedBy = (TextView) convertView.findViewById(R.id.tvRetweetedBy);
             convertView.setTag(holder);
         }else{
             holder = (TweetViewHolder)convertView.getTag();
@@ -94,11 +100,23 @@ public class TweetArrayAdapter extends ArrayAdapter<Tweet>{
         holder.tvRetweet.setText(NumberFormat.getNumberInstance(convertView.getResources().getConfiguration().locale).format(getItem(position).getRetweetCount()));
         holder.tvFavorite.setText(NumberFormat.getNumberInstance(convertView.getResources().getConfiguration().locale).format(getItem(position).getFavoriteCount()));
 
+        if(getItem(position).isRetweet()){
+            double drawableScaleForRetweetedBy = 0.4;
+            Drawable retweetedBy = this.getContext().getResources().getDrawable(android.R.drawable.ic_popup_sync);
+            retweetedBy.setColorFilter(Color.LTGRAY, PorterDuff.Mode.MULTIPLY);
+            scaleDrawable(retweetedBy, drawableScaleForRetweetedBy);
+            holder.tvRetweetedBy.setText(getItem(position).getPosterNotRetweeter().getProfilename() + " retweeted");
+            holder.tvRetweetedBy.setCompoundDrawables(retweetedBy, null, null, null);
+            holder.llRetweetInfoBar.setVisibility(View.VISIBLE);
 
-        double drawableScale = 0.7;
+        }else{
+            holder.llRetweetInfoBar.setVisibility(View.GONE);
+        }
+
+        double drawableScaleForInteractionBarIcons = 0.7;
 
         Drawable retweet = this.getContext().getResources().getDrawable(android.R.drawable.ic_popup_sync);
-        scaleDrawable(retweet, drawableScale);
+        scaleDrawable(retweet, drawableScaleForInteractionBarIcons);
         if(getItem(position).posterRetweeted()){
             //retweeting is not undoable
             retweet.setColorFilter(Color.GREEN, PorterDuff.Mode.MULTIPLY);
@@ -146,9 +164,9 @@ public class TweetArrayAdapter extends ArrayAdapter<Tweet>{
 
 
         Drawable favoriteOff = this.getContext().getResources().getDrawable(android.R.drawable.btn_star_big_off);
-        scaleDrawable(favoriteOff, drawableScale);
+        scaleDrawable(favoriteOff, drawableScaleForInteractionBarIcons);
         Drawable favoriteOn = this.getContext().getResources().getDrawable(android.R.drawable.btn_star_big_on);
-        scaleDrawable(favoriteOn, drawableScale);
+        scaleDrawable(favoriteOn, drawableScaleForInteractionBarIcons);
         holder.tvFavorite.setTag(R.id.favoriteOff, favoriteOff);
         holder.tvFavorite.setTag(R.id.favoriteOn, favoriteOn);
 
@@ -186,7 +204,7 @@ public class TweetArrayAdapter extends ArrayAdapter<Tweet>{
         });
 
         Drawable reply = this.getContext().getResources().getDrawable(android.R.drawable.ic_menu_revert);
-        scaleDrawable(reply, drawableScale);
+        scaleDrawable(reply, drawableScaleForInteractionBarIcons);
         reply.setColorFilter(Color.LTGRAY, PorterDuff.Mode.MULTIPLY);
         holder.tvReply.setCompoundDrawables(reply, null, null, null);
         holder.tvReply.setOnClickListener(new View.OnClickListener(){
