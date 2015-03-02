@@ -1,9 +1,36 @@
 ### Twitter client
-A basic Android twitter client, built during a @codepath course on app development in Android. The purpose of the assignment was to practice networking with APIs and trying out an ORM for data persistance.
+A basic Android twitter client, built during a @codepath course on app development in Android. The purpose of the assignment was to practice networking with APIs and trying out an ORM for data persistance in addition to using fragments and viewpagers.
 
 #### Details
 - How much time did this take?
-  - This took me probably close to 12 hours of dev time. Most of that was spent on the UI layouts (including iterations)
+  - This took a bit more than 25 hours of dev time. Most of that was spent on the UI layouts (including iterations)
+
+#### Requirements
+##### Week 2:
+- Required user stories completed:
+  - [x] All stories from last week complete
+  - [x] User can switch between Timeline and Mention views with tabs
+  - [x] User can see their own profile
+    - [x] Includes avatar, tagline, #/followers, #/following, and a tweet feed
+  - [x] User can click on any tweet's avatar to see their profile
+  - [x] User can infinitely paginate on any timeline in the app
+- Advanced user stories completed:
+  - [x] Robust error handling re: network connectivity/other error cases
+  - [x] (Done for first week) User can reply to any tweet on timelines
+    - [x] (Done for the first week) User can favorite and retweet tweets on timelines
+  - [x] Improve the user interface and theme of the app to feel like Twitter
+- My own additional features:
+  - [x] Viewpager on profile bio area to see description and location like real Twitter app
+  - [x] See retweeted tweets the way you would on Twitter ("retweeted by" on the tweet, tweet shows original user's info, etc.)
+  - [x] Banner image on profile view like the real Twitter app
+  - [x] Swipe down to refresh on any timeline view
+ 
+###### Week 2 demo 
+enjoy this demo of the latest features (made with [LICEcap](http://www.cockos.com/licecap/))
+
+![Demo GIF](https://github.com/ekilah/codepathtwitter/blob/master/demo_profile_mentions.gif)
+
+##### Week 1: 
 - Required user stories completed:
   - [x] User can sign in to Twitter using OAuth login
   - [x] User can view tweets from their home timeline:
@@ -28,8 +55,9 @@ A basic Android twitter client, built during a @codepath course on app developme
   - [x] Favorite/unfavorite functionality
   - [x] Red character count & disabled tweet button on compose for invalid inputs
 
-####Demo time!
-enjoy these demos of the latest features (made with [LICEcap](http://www.cockos.com/licecap/))
+
+###### Week 1 demos
+enjoy these demos of week 1's features (made with [LICEcap](http://www.cockos.com/licecap/))
 
 ![Demo GIF](https://github.com/ekilah/codepathtwitter/blob/master/demo.gif)
 
