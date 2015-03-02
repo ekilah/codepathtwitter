@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rlProfileBioAreaDescriptionAndLocation"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/profile_banner_overlay"
+    android:gravity="center_vertical"
+    >
+
+    <TextView android:id="@+id/tvProfileDescription"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:gravity="center_horizontal"
+              tools:text="writer of some awesome code"
+              android:layout_below="@id/rlProfileAvatarBg"
+              android:layout_centerHorizontal="true"
+              android:textStyle="bold"
+              android:textColor="#FFFFFF"
+              android:layout_marginBottom="10dp"
+
+        />
+    <TextView android:id="@+id/tvProfileLocation"
+              android:layout_below="@id/tvProfileDescription"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:gravity="center_horizontal"
+              tools:text="usc"
+              android:layout_centerHorizontal="true"
+              android:textColor="#FFFFFF"
+
+        />
+</RelativeLayout>

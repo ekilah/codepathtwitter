@@ -5,16 +5,17 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +25,8 @@ import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.TwitterApplication;
 import com.codepath.apps.restclienttemplate.TwitterClient;
 import com.codepath.apps.restclienttemplate.fragments.ComposeTweetFragment;
+import com.codepath.apps.restclienttemplate.fragments.DescriptionBioProfileFragment;
+import com.codepath.apps.restclienttemplate.fragments.InfoBioProfileFragment;
 import com.codepath.apps.restclienttemplate.fragments.TimelineFragment;
 import com.codepath.apps.restclienttemplate.fragments.UserTimelineFragment;
 import com.codepath.apps.restclienttemplate.helpers.TwitterApi;
@@ -37,14 +40,41 @@ import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.List;
-
 public class ProfileActivity extends ActionBarActivity implements TimelineFragment.TimelineFragmentListener{
 
     public static String INTENT_EXTRA_USERID = "userId";
 
     User user;
+
+    ViewPager vpBio;
+    ProfileBioViewPagerAdapter profileBioViewPagerAdapter;
+    InfoBioProfileFragment infoBioProfileFragment;
+    DescriptionBioProfileFragment descriptionBioProfileFragment;
+
     Target backgroundImageTarget;
+
+    private class ProfileBioViewPagerAdapter extends FragmentPagerAdapter{
+
+        public ProfileBioViewPagerAdapter(FragmentManager fm){
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position){
+            if(position == 0){
+                return infoBioProfileFragment;
+            }else if(position == 1){
+                return descriptionBioProfileFragment;
+            }
+
+            return null;
+        }
+
+        @Override
+        public int getCount(){
+            return 2;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -65,85 +95,50 @@ public class ProfileActivity extends ActionBarActivity implements TimelineFragme
             return;
         }
 
-        //successfully retrieved user object, populate profile
-        Picasso.with(getContext()).load(this.user.getAvatarURL()).into((ImageView)findViewById(R.id.ivProfileAvatar));
+        UserTimelineFragment userTimelineFragment = UserTimelineFragment.newInstance(user.getUsername());
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.flProfileActivityFeedFrame, userTimelineFragment);
+        transaction.commit();
+
+        infoBioProfileFragment = InfoBioProfileFragment.newInstance(this.user);
+        descriptionBioProfileFragment = DescriptionBioProfileFragment.newInstance(this.user);
+
+        vpBio = (ViewPager) findViewById(R.id.vpBioPager);
+        profileBioViewPagerAdapter = new ProfileBioViewPagerAdapter(getSupportFragmentManager());
+        vpBio.setAdapter(profileBioViewPagerAdapter);
+
+        TextView tvTweetCount = (TextView) findViewById(R.id.tvProfileCounterTweetsCount);
+        TextView tvFollowingCount = (TextView) findViewById(R.id.tvProfileCounterFollowingCount);
+        TextView tvFollowersCount = (TextView) findViewById(R.id.tvProfileCounterFollowersCount);
+
+        tvTweetCount.setText(this.user.getPostsCount());
+        tvFollowingCount.setText(this.user.getFollowingCount());
+        tvFollowersCount.setText(this.user.getFollowersCount());
+
         backgroundImageTarget = new Target(){
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from){
                 RelativeLayout rlBioArea = (RelativeLayout) findViewById(R.id.rlProfileBioArea);
                 rlBioArea.setBackground(new BitmapDrawable(getResources(), bitmap));
-                Log.w("TWITTER", "onBitmapLoaded in profileactivity for username="+ProfileActivity.this.user.getUsername());
+                Log.w("TWITTER", "onBitmapLoaded in InfoBioProfileFragment for username=" + ProfileActivity.this.user.getUsername());
 
             }
 
             @Override
             public void onBitmapFailed(Drawable errorDrawable){
-                Log.e("TWITTER", "target bitmap load failed in profileactivity for username" + ProfileActivity.this.user.getUsername());
+                Log.e("TWITTER", "target bitmap load failed in InfoBioProfileFragment for username" + ProfileActivity.this.user.getUsername());
             }
 
             @Override
             public void onPrepareLoad(Drawable placeHolderDrawable){
-                Log.w("TWITTER", "onprepareload target in profileactivity for username="+ProfileActivity.this.user.getUsername());
+                Log.w("TWITTER", "onprepareload target in InfoBioProfileFragment for username=" + ProfileActivity.this.user.getUsername());
             }
         };
 
         //fetch backround image url and populate view
         this.fetchProfileBackground();
 
-        TextView tvDisplayName = (TextView) findViewById(R.id.tvProfileDisplayName);
-        TextView tvUsername = (TextView) findViewById(R.id.tvProfileUsername);
-        TextView tvTweetCount = (TextView) findViewById(R.id.tvProfileCounterTweetsCount);
-        TextView tvFollowingCount = (TextView) findViewById(R.id.tvProfileCounterFollowingCount);
-        TextView tvFollowersCount = (TextView) findViewById(R.id.tvProfileCounterFollowersCount);
-
-        tvDisplayName.setText(this.user.getProfilename());
-        tvUsername.setText("@" + this.user.getUsername());
-        tvTweetCount.setText(this.user.getPostsCount());
-        tvFollowingCount.setText(this.user.getFollowingCount());
-        tvFollowersCount.setText(this.user.getFollowersCount());
-
-        UserTimelineFragment userTimelineFragment = UserTimelineFragment.newInstance(user.getUsername());
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.flProfileActivityFrame, userTimelineFragment);
-        transaction.commit();
-
     }
-
-    public void fetchProfileBackground(){
-        TwitterClient client = TwitterApplication.getTwitterClient();
-        if(!client.isNetworkAvailable()){
-            Log.e("TWIITER", "can't fetch background image - network unavailable");
-            return;
-        }
-
-        client.getUserProfileBannerByUsername(this.user.getUsername(), new JsonHttpResponseHandler(){
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response){
-                try{
-                    JSONObject sizesObj = response.getJSONObject(TwitterApi.RESPONSE_KEY_USER_PROFILE_BANNER_IMAGE_SIZES);
-                    JSONObject mobileImageObj = sizesObj.getJSONObject(TwitterApi.RESPONSE_KEY_USER_PROFILE_BANNER_IMAGE_MOBILE);
-                    ProfileActivity.this.user.setBackgroundURL(mobileImageObj.getString(TwitterApi.RESPONSE_KEY_USER_PROFILE_BANNER_IMAGE_URL));
-                    Picasso.with(getContext()).load(ProfileActivity.this.user.getBackgroundURL()).into(backgroundImageTarget);
-                    Log.w("TWITTER", "background URL being used for profile: " + ProfileActivity.this.user.getBackgroundURL());
-                }catch(JSONException e){
-                    Log.e("TWITTER", "error parsing JSON for successful getUserProfileBannerByUsername request. repsonse=" + (response==null ? "null" : response.toString()));
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable){
-                Log.e("TWITTER", "failed to get user profile banner. response string: " + (responseString == null ? "(null)" : responseString));
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse){
-                Log.e("TWITTER", "(HTTP " + statusCode + ")failed to get user profile banner. response string: " + (errorResponse == null ? "(null)" : errorResponse.toString()));
-
-            }
-        });
-
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
@@ -245,5 +240,40 @@ public class ProfileActivity extends ActionBarActivity implements TimelineFragme
     @Override
     public Context getContext(){
         return this;
+    }
+
+    public void fetchProfileBackground(){
+        TwitterClient client = TwitterApplication.getTwitterClient();
+        if(!client.isNetworkAvailable()){
+            Log.e("TWIITER", "can't fetch background image - network unavailable");
+            return;
+        }
+
+        client.getUserProfileBannerByUsername(this.user.getUsername(), new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response){
+                try{
+                    JSONObject sizesObj = response.getJSONObject(TwitterApi.RESPONSE_KEY_USER_PROFILE_BANNER_IMAGE_SIZES);
+                    JSONObject mobileImageObj = sizesObj.getJSONObject(TwitterApi.RESPONSE_KEY_USER_PROFILE_BANNER_IMAGE_MOBILE);
+                    ProfileActivity.this.user.setBackgroundURL(mobileImageObj.getString(TwitterApi.RESPONSE_KEY_USER_PROFILE_BANNER_IMAGE_URL));
+                    Picasso.with(getContext()).load(ProfileActivity.this.user.getBackgroundURL()).into(backgroundImageTarget);
+                    Log.w("TWITTER", "background URL being used for profile: " + ProfileActivity.this.user.getBackgroundURL());
+                }catch(JSONException e){
+                    Log.e("TWITTER", "error parsing JSON for successful getUserProfileBannerByUsername request. repsonse=" + (response==null ? "null" : response.toString()));
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable){
+                Log.e("TWITTER", "failed to get user profile banner. response string: " + (responseString == null ? "(null)" : responseString));
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse){
+                Log.e("TWITTER", "(HTTP " + statusCode + ")failed to get user profile banner. response string: " + (errorResponse == null ? "(null)" : errorResponse.toString()));
+
+            }
+        });
+
     }
 }

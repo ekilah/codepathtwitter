@@ -25,6 +25,8 @@ public class TwitterApi{
     public static final String RESPONSE_KEY_USER_PROFILE_BANNER_IMAGE_SIZES = "sizes";
     public static final String RESPONSE_KEY_USER_PROFILE_BANNER_IMAGE_URL = "url";
     public static final String RESPONSE_KEY_USER_PROFILE_BANNER_IMAGE_MOBILE = "mobile_retina";
+    public static final String RESPONSE_KEY_USER_PROFILE_DESCRIPTION = "description";
+    public static final String RESPONSE_KEY_USER_PROFILE_LOCATION = "location";
 
     public static final int TWEET_CHARACTER_LIMIT = 140;
 

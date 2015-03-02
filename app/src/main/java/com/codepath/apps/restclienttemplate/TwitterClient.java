@@ -7,6 +7,7 @@ import org.scribe.builder.api.TwitterApi;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.codepath.oauth.OAuthBaseClient;
@@ -78,7 +79,7 @@ public class TwitterClient extends OAuthBaseClient {
     public void getMentionsTimeline(long maxId, long sinceId, AsyncHttpResponseHandler handler) {
         String apiUrl = getApiUrl("statuses/mentions_timeline.json");
         RequestParams params = new RequestParams();
-
+        Log.e("TWITTER", "mentions: maxId=" + maxId + ", sinceId=" + sinceId);
         if(maxId >=0){
             params.put("max_id", maxId);
         }

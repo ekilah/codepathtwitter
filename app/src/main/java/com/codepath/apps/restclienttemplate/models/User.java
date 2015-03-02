@@ -39,6 +39,12 @@ public class User extends Model{
     @Column(name = "followingCount")
     private String followingCount;
 
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "location")
+    private String location;
+
 
     public User(){
         super();
@@ -53,6 +59,8 @@ public class User extends Model{
             this.postsCount = userObj.getString(TwitterApi.RESPONSE_KEY_USER_COUNT_POSTS);
             this.followersCount = userObj.getString(TwitterApi.RESPONSE_KEY_USER_COUNT_FOLLOWERS);
             this.followingCount = userObj.getString(TwitterApi.RESPONSE_KEY_USER_COUNT_FOLLOWING);
+            this.description = userObj.getString(TwitterApi.RESPONSE_KEY_USER_PROFILE_DESCRIPTION);
+            this.location = userObj.getString(TwitterApi.RESPONSE_KEY_USER_PROFILE_LOCATION);
 
             //get bigger image from twitter
             this.avatarURL = this.avatarURL.replace("normal.", "bigger.");
@@ -125,5 +133,13 @@ public class User extends Model{
     public void setBackgroundURL(String backgroundURL){
         this.backgroundURL = backgroundURL;
         this.save();
+    }
+
+    public String getDescription(){
+        return description;
+    }
+
+    public String getLocation(){
+        return location;
     }
 }

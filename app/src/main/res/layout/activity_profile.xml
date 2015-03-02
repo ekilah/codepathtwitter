@@ -33,66 +33,19 @@
         android:layout_width="match_parent"
         android:layout_height="150dp"
         android:gravity="center_vertical"
-        android:background="@android:color/darker_gray"
+        android:background="@drawable/profile_banner_overlay_darker"
+
         >
 
-
-
-        <RelativeLayout android:id="@+id/rlProfileBioAreaAboveOverlay"
+        <android.support.v4.view.ViewPager
+            android:id="@+id/vpBioPager"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/profile_banner_overlay"
-            android:gravity="center_vertical"
-            >
-
-            <RelativeLayout android:id="@+id/rlProfileAvatarBg"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="1dp"
-                android:paddingBottom="1dp"
-                android:paddingLeft="3dp"
-                android:paddingRight="3dp"
-                android:layout_centerHorizontal="true"
-                android:background="@android:color/white"
-                android:gravity="center_vertical"
-                >
-                <ImageView android:id="@+id/ivProfileAvatar"
-                           android:layout_width="50dp"
-                           android:layout_height="50dp"
-                           android:scaleType="fitCenter"
-                           tools:src="@drawable/ic_launcher"
-                           android:layout_marginBottom="5dp"
-                           android:layout_centerHorizontal="true"
-                           android:layout_centerVertical="true"
-
-                    />
-
-                </RelativeLayout>
+            android:layout_height="match_parent">
+        </android.support.v4.view.ViewPager>
 
 
-            <TextView android:id="@+id/tvProfileDisplayName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                tools:text="My cool profile name"
-                android:layout_below="@id/rlProfileAvatarBg"
-                android:layout_centerHorizontal="true"
-                android:textStyle="bold"
-                android:textColor="#FFFFFF"
+    </RelativeLayout>
 
-                />
-            <TextView android:id="@+id/tvProfileUsername"
-                android:layout_below="@id/tvProfileDisplayName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                tools:text="\@coolprofile123"
-                android:layout_centerHorizontal="true"
-                android:textColor="#FFFFFF"
-
-                />
-            </RelativeLayout>
-        </RelativeLayout>
     <LinearLayout android:id="@+id/rlProfileInfoBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -198,7 +151,7 @@
         android:layout_height= "1.5dp"
         android:background="@android:color/darker_gray" />
 
-    <FrameLayout android:id="@+id/flProfileActivityFrame"
+    <FrameLayout android:id="@+id/flProfileActivityFeedFrame"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
